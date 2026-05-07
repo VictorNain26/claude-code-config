@@ -1,0 +1,25 @@
+# Force LF sur les scripts bash. Sans ça, git Windows convertit en CRLF
+# au checkout, et Git Bash plante avec "unexpected EOF" sur les arrays
+# qui contiennent des backticks (bug observé sur prompt-injection-detector
+# avant suppression).
+*.sh           text eol=lf
+*.bash         text eol=lf
+
+# PowerShell scripts : LF est mieux mais Windows tolère CRLF aussi.
+*.ps1          text eol=lf
+*.psm1         text eol=lf
+
+# Python : LF (PEP 8 ne l'exige pas mais c'est la convention).
+*.py           text eol=lf
+
+# JSON / Markdown / YAML : LF pour cohérence cross-platform.
+*.json         text eol=lf
+*.jsonc        text eol=lf
+*.md           text eol=lf
+*.yml          text eol=lf
+*.yaml         text eol=lf
+*.toml         text eol=lf
+
+# Cas spéciaux
+*.bat          text eol=crlf
+*.cmd          text eol=crlf
