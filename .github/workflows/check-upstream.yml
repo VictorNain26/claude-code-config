@@ -1,0 +1,74 @@
+name: Check upstream guide updates
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # lundi 8h UTC
+  workflow_dispatch:      # déclenchable à la main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Récupérer la dernière version upstream
+        id: upstream
+        run: |
+          UPSTREAM_SHA=$(git ls-remote https://github.com/FlorianBruniaux/claude-code-ultimate-guide.git HEAD | cut -f1)
+          echo "sha=$UPSTREAM_SHA" >> "$GITHUB_OUTPUT"
+          UPSTREAM_DATE=$(curl -s "https://api.github.com/repos/FlorianBruniaux/claude-code-ultimate-guide/commits/main" | jq -r '.commit.committer.date')
+          echo "date=$UPSTREAM_DATE" >> "$GITHUB_OUTPUT"
+
+      - name: Récupérer la dernière vue locale (issue tracker)
+        id: local
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LAST_ISSUE=$(gh issue list --repo "${{ github.repository }}" --label upstream-sync --state all --limit 1 --json title,body --jq '.[0].body // ""')
+          LAST_SEEN_SHA=$(echo "$LAST_ISSUE" | grep -oP 'sha:\K[a-f0-9]{40}' | head -1)
+          echo "last_sha=${LAST_SEEN_SHA:-none}" >> "$GITHUB_OUTPUT"
+
+      - name: Comparer + ouvrir une issue si nouveau
+        if: steps.upstream.outputs.sha != steps.local.outputs.last_sha
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY=$(cat <<EOF
+          ## Nouvelle version de claude-code-ultimate-guide
+
+          - Latest sha: ${{ steps.upstream.outputs.sha }}
+          - Date: ${{ steps.upstream.outputs.date }}
+          - Repo: https://github.com/FlorianBruniaux/claude-code-ultimate-guide
+
+          ### Action manuelle
+
+          \`\`\`powershell
+          cd \$env:USERPROFILE\Tools\claude-code-ultimate-guide
+          git pull
+          # Review des changements dans examples/{hooks,commands,agents,rules,scripts}/
+          # Copier les fichiers modifiés vers \$env:USERPROFILE\.claude\<dir>\ si pertinents
+          cd \$env:USERPROFILE\claude-code-config
+          .\\sync.ps1
+          git diff
+          git commit -am "chore: refresh from upstream guide"
+          git push
+          \`\`\`
+
+          ### Verification rapide changelog
+
+          - https://github.com/FlorianBruniaux/claude-code-ultimate-guide/blob/main/CHANGELOG.md
+          - https://github.com/FlorianBruniaux/claude-code-ultimate-guide/commits/main
+
+          Une fois traité, ferme cette issue (sha: ${{ steps.upstream.outputs.sha }}).
+          EOF
+          )
+          gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "Upstream update detecte: ${{ steps.upstream.outputs.date }}" \
+            --label "upstream-sync" \
+            --body "$BODY"
+
+      - name: Aucun changement
+        if: steps.upstream.outputs.sha == steps.local.outputs.last_sha
+        run: echo "Pas de nouveau commit upstream. SHA local = $LAST_SEEN_SHA"
