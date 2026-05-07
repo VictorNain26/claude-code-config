@@ -1,0 +1,37 @@
+# Runtime data / secrets — JAMAIS commiter
+.credentials.json
+.claude.json
+*.bak
+*.bak-*
+mcp-needs-auth-cache.json
+security_warnings_state_*.json
+stats-cache.json
+history.jsonl
+settings.local.json
+CLAUDE.local.md
+
+# Auto-géré par Claude Code (ne pas synchroniser)
+projects/
+todos/
+statsig/
+plugins/cache/
+plugins/marketplaces/
+paste-cache/
+sessions/
+telemetry/
+shell-snapshots/
+file-history/
+debug/
+downloads/
+ide/
+session-env/
+tasks/
+backups/
+chrome/
+cache/
+plans/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
