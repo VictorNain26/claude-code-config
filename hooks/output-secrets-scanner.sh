@@ -41,46 +41,43 @@ if [[ -z "$TOOL_OUTPUT" ]]; then
 fi
 
 # Secret patterns to detect
+# Only patterns with a distinctive prefix or structure are kept.
+# Loose regexes like [a-zA-Z0-9]{32,} were removed because they match git SHAs,
+# lockfile entries, MD5 hashes, etc., producing false positives on every git/cat output.
 declare -A SECRET_PATTERNS=(
-    # API Keys
+    # API Keys (distinctive prefix required)
     ["OpenAI API Key"]="sk-[a-zA-Z0-9]{20,}"
     ["Anthropic API Key"]="sk-ant-[a-zA-Z0-9]{20,}"
     ["AWS Access Key"]="AKIA[0-9A-Z]{16}"
-    ["AWS Secret Key"]="[0-9a-zA-Z/+]{40}"
     ["GCP API Key"]="AIza[0-9A-Za-z_-]{35}"
-    ["Azure Key"]="[a-zA-Z0-9]{32,}"
     ["Stripe Key"]="(sk|pk)_(live|test)_[0-9a-zA-Z]{24,}"
     ["Twilio Key"]="SK[a-f0-9]{32}"
     ["SendGrid Key"]="SG\.[a-zA-Z0-9_-]{22}\.[a-zA-Z0-9_-]{43}"
     ["Slack Token"]="xox[baprs]-[0-9a-zA-Z-]{10,}"
     ["Discord Token"]="[MN][A-Za-z0-9]{23,}\.[A-Za-z0-9-_]{6}\.[A-Za-z0-9-_]{27}"
 
-    # Tokens
+    # Tokens (distinctive prefix required)
     ["GitHub Token"]="(ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36,}"
     ["GitLab Token"]="glpat-[a-zA-Z0-9_-]{20,}"
     ["NPM Token"]="npm_[a-zA-Z0-9]{36}"
     ["PyPI Token"]="pypi-[a-zA-Z0-9_-]{50,}"
-    ["JWT Token"]="eyJ[a-zA-Z0-9_-]*\.eyJ[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*"
-    ["Heroku API Key"]="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+    ["JWT Token"]="eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+"
 
-    # Private Keys
+    # Private Keys (block headers — unmistakable)
     ["Private Key"]="-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----"
     ["PGP Private Key"]="-----BEGIN PGP PRIVATE KEY BLOCK-----"
 
-    # Database
+    # Database connection strings with embedded passwords
     ["Database URL with Password"]="(postgres|mysql|mongodb)://[^:]+:[^@]+@"
     ["Redis URL with Password"]="redis://:[^@]+@"
 
-    # Generic (58% of leaked secrets are "generic" - GitGuardian 2025)
-    ["Generic API Key"]="(api[_-]?key|apikey|api[_-]?secret)['\"]?\s*[:=]\s*['\"]?[a-zA-Z0-9_-]{20,}"
-    ["Generic Secret"]="(secret|password|passwd|pwd)['\"]?\s*[:=]\s*['\"]?[^\s'\"]{8,}"
-    ["Generic Token"]="(token|auth[_-]?token|access[_-]?token|bearer)['\"]?\s*[:=]\s*['\"]?[a-zA-Z0-9_-]{20,}"
-    ["Private Key Inline"]="['\"]?-----BEGIN[^-]+PRIVATE KEY-----"
-
-    # Environment Variable Leakage
-    ["Env Dump Command"]="^(env|printenv|set)$"
+    # Environment Variable Leakage (command shapes)
+    ["Env Dump Command"]="^(env|printenv|set)\$"
     ["Proc Environ Access"]="/proc/self/environ|/proc/[0-9]+/environ"
 )
+# Removed (FP-prone): AWS Secret Key 40-char, Azure 32-char, Heroku UUID,
+# Generic API Key/Secret/Token/Inline Private Key — they matched git SHAs,
+# example docs, hashes, password="changeme" snippets. Distinctive prefix only.
 
 DETECTED_SECRETS=()
 

@@ -74,13 +74,25 @@ scan_file() {
 # Scan all potential CLAUDE.md locations
 scan_file "CLAUDE.md"
 scan_file ".claude/CLAUDE.md"
+scan_file "constitution.md"
 
-# Also scan any .md files in .claude/ directory that might be loaded
+# Scan loose .md in .claude/
 if [[ -d ".claude" ]]; then
     for md_file in .claude/*.md; do
         [[ -f "$md_file" ]] && scan_file "$md_file"
     done
 fi
+
+# Scan all CLAUDE.md and rules at depth <=3 (covers monorepo apps/* layouts)
+# Excludes node_modules, .git, dist, build, .next, .expo, .turbo, coverage, .maestro-output
+while IFS= read -r found; do
+    scan_file "$found"
+done < <(find . -maxdepth 3 \
+    \( -path './node_modules' -o -path './.git' -o -path './dist' -o -path './build' \
+       -o -path './.next' -o -path './.expo' -o -path './.turbo' -o -path './coverage' \
+       -o -path './.maestro-output' -o -path './.claude/worktrees' \) -prune -o \
+    \( -name 'CLAUDE.md' -o -path './.claude/rules/*.md' \) -type f -print 2>/dev/null \
+    | grep -v '^./CLAUDE.md$' | grep -v '^./.claude/CLAUDE.md$' | grep -v '^./.claude/[^/]*\.md$')
 
 # Output warnings if any found
 if [[ ${#WARNINGS[@]} -gt 0 ]]; then

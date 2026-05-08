@@ -31,7 +31,7 @@ Avant d'écrire ou modifier un fichier de config tiers, un usage SDK non trivial
 
 - Jamais push direct sur `main`/`master`. PR only.
 - Jamais `--no-verify`, `--no-gpg-sign`, ou skip hooks sauf demande explicite. Si un hook fail, trouver la cause.
-- Stage explicitement : `git add <fichier>`. Jamais `git add .` ni `-A` (capture .env, secrets, fichiers oubliés). Cf. hook `block-git-add-wildcard`.
+- Stage explicitement : `git add <fichier>`. Jamais `git add .` ni `-A` (capture .env, secrets, fichiers oubliés). Bloqué par `permissions.deny` global.
 - Lecture des `.env*`, `*.pem`, `*.key`, `credentials*`, `secrets*` interdite par défaut (cf. `permissions.deny` global).
 - Avant action irréversible (force push, reset --hard, rm -rf, drop DB, suppression branche distante, fermeture/merge de PR) : annoncer + demander confirmation.
 
