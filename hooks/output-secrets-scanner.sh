@@ -46,8 +46,9 @@ fi
 # lockfile entries, MD5 hashes, etc., producing false positives on every git/cat output.
 declare -A SECRET_PATTERNS=(
     # API Keys (distinctive prefix required)
-    ["OpenAI API Key"]="sk-[a-zA-Z0-9]{20,}"
-    ["Anthropic API Key"]="sk-ant-[a-zA-Z0-9]{20,}"
+    # OpenAI modern formats: sk-proj-..., sk-svcacct-..., sk-... (legacy)
+    ["OpenAI API Key"]="sk-(proj-|svcacct-)?[a-zA-Z0-9_-]{20,}"
+    ["Anthropic API Key"]="sk-ant-[a-zA-Z0-9_-]{20,}"
     ["AWS Access Key"]="AKIA[0-9A-Z]{16}"
     ["GCP API Key"]="AIza[0-9A-Za-z_-]{35}"
     ["Stripe Key"]="(sk|pk)_(live|test)_[0-9a-zA-Z]{24,}"
