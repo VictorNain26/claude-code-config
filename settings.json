@@ -100,22 +100,10 @@
                            "commit-commands@claude-plugins-official":  true,
                            "feature-dev@claude-plugins-official":  true,
                            "javascript-typescript@claude-code-workflows":  true,
-                           "expo-app-design@expo-plugins":  true,
-                           "expo-deployment@expo-plugins":  true,
-                           "upgrading-expo@expo-plugins":  true,
                            "context7@claude-plugins-official":  true,
                            "security-guidance@claude-plugins-official":  true,
-                           "code-review@claude-plugins-official":  true,
                            "typescript-lsp@claude-plugins-official":  true
                        },
-    "extraKnownMarketplaces":  {
-                                   "expo-plugins":  {
-                                                        "source":  {
-                                                                       "source":  "github",
-                                                                       "repo":  "expo/skills"
-                                                                   }
-                                                    }
-                               },
     "effortLevel":  "xhigh",
     "autoUpdatesChannel":  "latest",
     "inputNeededNotifEnabled":  true,
