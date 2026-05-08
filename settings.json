@@ -104,7 +104,6 @@
                            "expo-deployment@expo-plugins":  true,
                            "upgrading-expo@expo-plugins":  true,
                            "context7@claude-plugins-official":  true,
-                           "claude-md-management@claude-plugins-official":  true,
                            "security-guidance@claude-plugins-official":  true,
                            "code-review@claude-plugins-official":  true,
                            "typescript-lsp@claude-plugins-official":  true
