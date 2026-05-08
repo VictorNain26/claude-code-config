@@ -175,7 +175,19 @@
                                                         }
                                                     ]
                                       }
-                                  ]
+                                  ],
+                  "InstructionsLoaded":  [
+                                            {
+                                                "hooks":  [
+                                                              {
+                                                                  "type":  "command",
+                                                                  "command":  "\"C:/Program Files/Git/bin/bash.exe\" \"$env:USERPROFILE/.claude/hooks/instructions-loaded-scanner.sh\"",
+                                                                  "async":  true,
+                                                                  "timeout":  5
+                                                              }
+                                                          ]
+                                            }
+                                        ]
               },
     "statusLine":  {
                        "type":  "command",
