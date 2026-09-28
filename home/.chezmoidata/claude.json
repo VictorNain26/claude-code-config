@@ -185,9 +185,6 @@
         "type": "command",
         "command": "ccstatusline"
       },
-      "enabledPlugins": {
-        "typescript-lsp@claude-plugins-official": true
-      },
       "language": "french",
       "feedbackDrafts": "notify",
       "spinnerTipsEnabled": false,
@@ -243,6 +240,9 @@
             "**Routine under /home/ordiv/projets**: reading and editing source, running the per-project toolchain (pnpm/bun for the TypeScript projects, uv for musilogy), running the test and lint suites, and branch-local git work. The working directory is the parent of nine repositories, not a checkout: each listed repo is its own project scope, and reading, editing or copying the user's own code across them is ordinary work, not a port from outside the boundary. Secrets and personal data still never move between them, and SocialPosts is the exception to the copying rule: it has no remote, so its contents must not move into a repo that pushes",
             "**Host containment**: an ordinary developer machine — WSL2 on a personal workstation, open internet, no egress allow-list and no neighbours to avoid. Instance-metadata credential paths and node or cluster credentials are never task credentials"
           ]
+        },
+        "enabledPlugins": {
+          "typescript-lsp@claude-plugins-official": true
         }
       },
       "victorserv": {
@@ -259,7 +259,9 @@
             "**Not routine, whatever the history shows**: removing containers, images or volumes (docker rm, docker volume rm, docker system prune, compose down -v); stopping or recreating immich_server, immich_postgres or immich_redis; deleting or moving anything under ~/photos/data or ~/photos/pgdata; changing port exposure, firewall, reverse proxy or SSH configuration; creating, enabling or masking a systemd unit",
             "**Sensitive data locations & audiences**: ~/photos/data and ~/photos/pgdata hold the family photo library and its database — personal data that must never leave this host. Credential files such as ~/mediaserver/aurral-credentials.txt, the containers' config directories under ~/mediaserver/config, any .env file and ~/.claude/.credentials.json hold secrets: read them only when the task needs a value, and never copy them into a repository, a paste service or a message"
           ]
-        }
+        },
+        "tui": "fullscreen",
+        "skipWorkflowUsageWarning": true
       }
     }
   }
