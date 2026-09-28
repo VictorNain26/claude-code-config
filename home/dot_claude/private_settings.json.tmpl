@@ -1,4 +1,5 @@
-{{- if not (hasKey .claude.hosts .chezmoi.hostname) -}}
-{{-   fail (printf "no Claude settings for host %q in .chezmoidata/claude.json" .chezmoi.hostname) -}}
+{{- $host := get . "host" | default .chezmoi.hostname -}}
+{{- if not (hasKey .claude.hosts $host) -}}
+{{-   fail (printf "no Claude settings for host %q in .chezmoidata/claude.json (set data.host in chezmoi.toml to pick another key)" $host) -}}
 {{- end -}}
-{{- mergeOverwrite (deepCopy .claude.settings) (index .claude.hosts .chezmoi.hostname) | toPrettyJson }}
+{{- mergeOverwrite (deepCopy .claude.settings) (index .claude.hosts $host) | toPrettyJson }}

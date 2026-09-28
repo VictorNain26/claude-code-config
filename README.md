@@ -36,7 +36,10 @@ chezmoi apply
 npm install -g ccstatusline@2.2.30
 ```
 
-Une nouvelle machine demande d'abord son entrée dans `claude.hosts`.
+Une nouvelle machine demande d'abord son entrée dans `claude.hosts`. La clé est
+`.chezmoi.hostname`, sauf si le `chezmoi.toml` de la machine fixe
+`[data] host = "…"` : c'est le cas du serveur, où chezmoi lit `app` (une entrée
+de blocage dans `/etc/hosts`) au lieu de `victorserv`.
 
 ## Au quotidien
 
