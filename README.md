@@ -26,10 +26,15 @@ classifieur ne lit que dans les réglages utilisateur
 configuration »). Chaque machine déclare son rôle dans son `chezmoi.toml` ; sans
 lui, `chezmoi apply` échoue au lieu d'écrire des réglages incomplets.
 
-`autoMode.environment` commence par `"$defaults"` et ne décrit que ce qui
-diffère des entrées par défaut (`claude auto-mode defaults`), par rôle plutôt
-que par liste de dépôts. Ce qui ne vaut que pour un dépôt va dans son
-`CLAUDE.md`, que le classifieur lit aussi.
+`autoMode.environment` est la liste complète, un emplacement par entrée, comme
+l'écrit `/auto-mode-setup` (code.claude.com/docs/en/auto-mode-config, « Review
+and save the draft ») : avec `"$defaults"`, l'entrée par défaut d'un emplacement
+reste à côté de la nôtre et la contredit (`claude auto-mode critique`). Les
+emplacements non personnalisés recopient `claude auto-mode defaults` : les
+revoir quand Claude Code change ses valeurs par défaut. Les entrées décrivent
+par rôle, pas par liste de dépôts ; les interdictions sont des règles
+`soft_deny` (avec `"$defaults"`), pas du texte d'environnement. Ce qui ne vaut
+que pour un dépôt va dans son `CLAUDE.md`, que le classifieur lit aussi.
 
 Hors dépôt, par machine : `~/.claude.json` (serveurs MCP, état d'exécution),
 `~/.claude/.credentials.json`, et les skills installés par leur outil officiel
