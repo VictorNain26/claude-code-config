@@ -1,0 +1,25 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* Claude Code writes this file too (/config, /model, plugins): impose the
+       keys this repository sets, keep every other key the file holds. A key set
+       here replaces the machine's value whole, except enabledPlugins, merged
+       plugin by plugin so a plugin installed on one machine survives. */ -}}
+{{- $host := get . "host" | toString -}}
+{{- if not (hasKey .claude.hosts $host) -}}
+{{-   fail (printf "set [data] host in chezmoi.toml to one of %s (got %q)" (keys .claude.hosts | sortAlpha | join ", ") $host) -}}
+{{- end -}}
+{{- $managed := mergeOverwrite (deepCopy .claude.settings) (deepCopy (index .claude.hosts $host)) -}}
+{{- $current := dict -}}
+{{- if trim .chezmoi.stdin -}}
+{{-   $current = fromJson .chezmoi.stdin -}}
+{{- end -}}
+{{- $plugins := deepCopy (get $current "enabledPlugins" | default dict) -}}
+{{- range $name, $enabled := get $managed "enabledPlugins" | default dict -}}
+{{-   $_ := set $plugins $name $enabled -}}
+{{- end -}}
+{{- range $key, $value := $managed -}}
+{{-   $_ := set $current $key $value -}}
+{{- end -}}
+{{- if $plugins -}}
+{{-   $_ := set $current "enabledPlugins" $plugins -}}
+{{- end -}}
+{{ toPrettyJson $current }}
