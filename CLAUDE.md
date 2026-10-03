@@ -1,16 +1,18 @@
 # claude-code-config
 
-A public Claude Code environment installed as managed settings; `README.md`
-documents it for users.
+A public, opt-in Claude Code environment: `config/settings.json` linked into
+the managed-settings drop-in directory, `config/CLAUDE.md` imported from the
+user's CLAUDE.md, and the plugins of `.claude-plugin/marketplace.json`.
+`README.md` documents it for users.
 
 - Only what suits anyone who installs it goes here. A preference, a machine, a
   network or a stack belongs in a user's `~/.claude/` or a project's
   `.claude/settings.json`.
 - No custom tooling: a need is covered by a native Claude Code feature
   (managed settings, managed CLAUDE.md, plugin, skill) or a maintained tool.
-- Every rule in `policy/managed-settings.json` binds every installer and can't
-  be lifted: prefer `ask` to `deny` unless no legitimate request needs it.
-- `policy/CLAUDE.md` is loaded in every session of every installer: keep it
+- `config/settings.json` loads at the managed level: a `deny` there can't be
+  lifted by any other file. Prefer `ask` unless no legitimate request needs it.
+- `config/CLAUDE.md` is loaded in every session of every installer: keep it
   short, general, free of HTML comments (they would reach the console
   `claudeMd`).
 - After a change: `jq empty` on every JSON file, `claude plugin validate . --strict`
