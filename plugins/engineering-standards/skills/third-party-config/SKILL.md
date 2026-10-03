@@ -13,10 +13,13 @@ paths:
   - "**/drizzle.config.*"
   - ".github/workflows/*.{yml,yaml}"
   - "**/renovate.json"
-  - ".github/dependabot.yml"
+  - ".github/dependabot.{yml,yaml}"
   - "**/.coderabbit.yaml"
   - "**/Dockerfile"
+  - "**/Dockerfile.*"
+  - "**/*.Dockerfile"
   - "**/compose*.{yml,yaml}"
+  - "**/docker-compose*.{yml,yaml}"
   - "**/pnpm-workspace.yaml"
 ---
 
