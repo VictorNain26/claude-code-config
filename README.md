@@ -267,6 +267,9 @@ per-machine setup and can break Docker and dev servers until tuned. To try it:
   Errors tab of `/plugin`; for a private fork, check git access.
 - **The settings have no effect**: another managed source wins on that
   machine; `/status` shows it under `Skipped sources`.
+- **The clone moved or was deleted**: the link now points nowhere; Claude Code
+  starts without these settings (tested with 2.1.288). Recreate the link from
+  the new location, or remove it.
 
 ## Contributing
 
