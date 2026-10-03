@@ -4,6 +4,9 @@ on:
   pull_request:
   push:
     branches: [master]
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -29,7 +32,32 @@ jobs:
 
       - name: Validate marketplace and plugins
         run: |
+          claude --version
           claude plugin validate . --strict
           for p in plugins/*/; do
             claude plugin validate "$p" --strict
           done
+
+      # claude doctor exits 0 even when it reports invalid settings.
+      - name: Check the settings as installed
+        run: |
+          sudo mkdir -p /etc/claude-code/managed-settings.d
+          sudo ln -s "$GITHUB_WORKSPACE/config/settings.json" /etc/claude-code/managed-settings.d/50-claude-code-config.json
+          claude doctor < /dev/null | tee doctor.txt
+          ! grep -q "Invalid settings" doctor.txt
+
+  links:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: >-
+            --no-progress --include-fragments
+            --exclude '^https://claude\.ai/admin-settings'
+            --exclude '^https://gitlab\.example\.com'
+            './**/*.md'
