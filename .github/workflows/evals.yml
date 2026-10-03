@@ -1,0 +1,65 @@
+name: evals
+
+on:
+  pull_request:
+    paths: ["plugins/**", ".github/workflows/evals.yml"]
+  schedule:
+    - cron: "23 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [opus, sonnet]
+    env:
+      MODEL: ${{ matrix.model }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Claude Code
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      # Secrets are not passed to pull requests from forks.
+      - name: Run the eval suite
+        shell: bash
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "::notice::CLAUDE_CODE_OAUTH_TOKEN is not available; evals skipped."
+            exit 0
+          fi
+          claude --version
+          # Aliases are deliberate: the suite exists to catch model changes.
+          # Record which model the alias resolved to this week.
+          claude -p --model "$MODEL" --output-format stream-json --verbose "Reply ok" \
+            | jq -r 'select(.subtype == "init") | "Resolved model: \(.model)"'
+          claude plugin eval plugins/engineering-standards \
+            --trust-plugin --scaffold --ablation none \
+            --model "$MODEL" --judge-model haiku --threshold 0.66 --max-cost-usd 5 \
+            --no-publish --json "results-$MODEL.json" \
+            --allow-tools Edit Write WebFetch
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: eval-results-${{ matrix.model }}
+          path: |
+            results-*.json
+            plugins/engineering-standards/evals/results/
+          if-no-files-found: ignore
