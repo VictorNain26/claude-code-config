@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: config-edit-cites-docs
+description: Editing a GitHub Actions workflow loads third-party-config, which makes Claude read the docs before editing and cite them.
+context:
+  scaffold_script: scaffold.sh
