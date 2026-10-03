@@ -168,7 +168,8 @@
       "Edit(~/.netrc)",
       "Edit(~/.npmrc)",
       "Edit(~/.pypirc)",
-      "Edit(~/.claude/.credentials.json)"
+      "Edit(~/.claude/.credentials.json)",
+      "Bash("
     ],
     "disableBypassPermissionsMode": "disable"
   },
