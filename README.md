@@ -11,6 +11,7 @@ Use it as is, or fork it for your team.
 | Path | Contents | How Claude Code loads it |
 |---|---|---|
 | `config/settings.json` | permissions, bypass mode disabled, the plugin below | a settings file linked into the managed-settings drop-in directory ([managed-settings](https://code.claude.com/docs/en/managed-settings)) |
+| `config/sandbox.json` | OS-level sandbox for shell commands, with registry and GitHub hosts allowed and read-only Docker commands excluded | a second drop-in, linked only where the sandbox works (see [step 1b](#install)) ([sandboxing](https://code.claude.com/docs/en/sandboxing)) |
 | `config/CLAUDE.md` | working rules: reuse before writing, verify before claiming, code and git conventions | imported from your own `~/.claude/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)) |
 | `plugins/engineering-standards/` | skills `ui-design`, `tests`, `third-party-config`, each loaded when Claude reads or edits matching files | plugin from this repository's marketplace |
 
@@ -23,11 +24,14 @@ Permissions, in short:
   worktrees; read-only `gh` and `glab`; Docker builds, logs and inspection.
   Read-only git and shell commands need no rule: Claude Code runs them without
   a prompt ([permissions](https://code.claude.com/docs/en/permissions)).
-- **ask first**: pushes and merges; `reset --hard`, `clean -f`, recursive
-  `rm`, branch and tag deletion, interactive rebase, `--amend`, `--no-verify`,
-  `git add -A`; adding, removing or upgrading a dependency; `dlx`/`bunx`;
-  `docker exec`; publishing; PR/MR creation, merge and close; reading or
-  editing a project `.npmrc`; editing shell startup files.
+- **ask first** — rare, irreversible or public actions only: force pushes and
+  remote branch deletion, local branch and tag deletion, `--no-verify`;
+  adding, removing or upgrading a dependency; `dlx`/`bunx`; `docker exec`;
+  publishing and releases; merging or closing a PR/MR; reading or editing a
+  project `.npmrc`; editing shell startup files. Everyday actions such as
+  pushing, opening a PR, `reset --hard` or `rm -r` are left to the permission
+  mode: in auto mode, the default, Claude Code's classifier already blocks the
+  destructive forms ([permission-modes](https://code.claude.com/docs/en/permission-modes)).
 - **deny**: secret files — in the project, `.env` and `.env.*` (templates
   such as `.env.example`, `.sample`, `.template`, `.dist` stay readable),
   `.envrc`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, `secrets.*`; in your
@@ -87,6 +91,27 @@ $D = "C:\Program Files\ClaudeCode\managed-settings.d"
 New-Item -ItemType Directory -Force $D | Out-Null
 Copy-Item config\settings.json "$D\50-claude-code-config.json"
 ```
+
+**1b. Sandbox — macOS and native Linux only.** Link `config/sandbox.json`
+next to the settings. On Linux, install `bubblewrap` and `socat` first
+(`sudo apt-get install bubblewrap socat`), and on Ubuntu 24.04+ follow the
+AppArmor step of the [sandboxing page](https://code.claude.com/docs/en/sandboxing).
+
+```bash
+sudo ln -sf "$PWD/config/sandbox.json" /etc/claude-code/managed-settings.d/51-claude-code-config-sandbox.json
+# macOS: same link in "/Library/Application Support/ClaudeCode/managed-settings.d"
+```
+
+Skip this step on WSL2 for now: with Claude Code 2.1.288, the first network
+connection of each sandboxed command fails (`Failed to connect to localhost
+port 3128`), so `git fetch` and similar commands fail at random. Skip it on
+native Windows and WSL1, where the sandbox doesn't run. Without the link, the
+permission rules still apply.
+
+With the sandbox on, a command can't reach a server started outside it, such
+as a dev server or a database in a container: on Linux a sandboxed command's
+`localhost` is its own. Claude Code then offers to rerun the command outside
+the sandbox, through your permission mode.
 
 **2. Working rules** — import `config/CLAUDE.md` from your own CLAUDE.md.
 Spaces in the path must be escaped with a backslash, or the import is ignored
@@ -178,7 +203,7 @@ are listed in the
 Remove the settings link, the plugin and its marketplace:
 
 ```bash
-sudo rm /etc/claude-code/managed-settings.d/50-claude-code-config.json
+sudo rm -f /etc/claude-code/managed-settings.d/50-claude-code-config.json /etc/claude-code/managed-settings.d/51-claude-code-config-sandbox.json
 claude plugin marketplace remove claude-code-config
 ```
 
@@ -219,25 +244,27 @@ claude plugin marketplace remove team-config
   example `gh auth login && gh auth setup-git`
   ([host-marketplace](https://code.claude.com/docs/en/plugins/host-marketplace)).
 
-### Optional: sandbox
-
-The [sandbox](https://code.claude.com/docs/en/sandboxing) enforces file and
-network limits on shell commands at the OS level, which permission rules can't
-do for scripts and subprocesses. It isn't enabled here because it needs
-per-machine setup and can break Docker and dev servers until tuned. To try it:
-
-1. Linux and WSL2: `sudo apt-get install bubblewrap socat` (or `dnf`); on
-   Ubuntu 24.04+, follow the AppArmor step in the sandboxing page. macOS needs
-   nothing. Native Windows and WSL1 are not supported.
-2. Add `"sandbox": {"enabled": true}` to `~/.claude/settings.json`.
-3. Run `/sandbox` to check dependencies and status.
-
 ## Design decisions
 
 - **Settings as a drop-in, rules as an import.** The drop-in directory is the
   only native way to include a settings file whole, so an update replaces it
   instead of merging into yours; a CLAUDE.md import does the same for
   instructions. Both follow `git pull`.
+- **Few prompts, on purpose.** Claude Code users approve 93% of permission
+  prompts, and experienced users approve twice as often as new ones (Anthropic,
+  [auto mode](https://www.anthropic.com/engineering/claude-code-auto-mode),
+  [How we contain Claude](https://www.anthropic.com/engineering/how-we-contain-claude)):
+  a prompt on every push trains people to click through. `ask` is kept for
+  rare, irreversible or public actions; the classifier and the sandbox handle
+  the rest.
+- **Sandbox where it works.** It enforces file and network limits at the OS
+  level, including for scripts and `grep -r`, which permission rules can't
+  cover, and Anthropic measured 84% fewer prompts with it
+  ([Claude Code sandboxing](https://www.anthropic.com/engineering/claude-code-sandboxing)).
+  Prompt injection runs attacker commands in up to 84% of attempts on coding
+  agents ([Liu et al., 2025](https://arxiv.org/abs/2509.22040)), so a boundary
+  that doesn't depend on the model matters. It ships as a separate drop-in
+  because it doesn't work everywhere yet.
 - **`ask` rather than `deny`.** The drop-in sits at the managed level, and "if
   a tool is denied at any level, no other level can allow it"
   ([permissions](https://code.claude.com/docs/en/permissions)): a `deny` would
@@ -254,11 +281,21 @@ per-machine setup and can break Docker and dev servers until tuned. To try it:
   dependency; the prompt is where that happens.
 - **Secrets are guarded by rules, not hooks.** `Read` deny rules cover
   Claude's own reads, including `cat`, `head`, `tail` and `sed` in Bash, not a
-  script or container that opens the file — that is the sandbox's job. A secret-masking
-  hook was measured at ~0.55 s per tool call and rejected.
+  script, a container or `grep -r` run from a parent directory — the sandbox
+  covers those, because Claude Code merges `Read` deny rules into it
+  ([sandboxing](https://code.claude.com/docs/en/sandboxing)). A
+  secret-masking hook was measured at ~0.55 s per tool call and rejected.
 - **Bypass mode is disabled** (`disableBypassPermissionsMode`, as in
   Anthropic's managed-settings examples): skipping every check would void the
   rest.
+- **A short, mostly negative rule file.** `config/CLAUDE.md` is about 60
+  lines. Claude models follow 98–100% of instructions up to about 50
+  ([IFScale, 2025](https://arxiv.org/abs/2507.11538)), and in more than 5,000
+  Claude Code runs, the rules that helped were constraints ("do not…") while
+  positive directives such as "follow code style" hurt ([Guardrails Beat Guidance, 2026](https://arxiv.org/abs/2604.11088)).
+  Whether a rule file helps at all is still debated
+  ([Gloaguen et al., 2026](https://arxiv.org/abs/2602.11988)); the plugin's
+  evals are where this repository measures it.
 - **Skills instead of rules.** A plugin can't ship CLAUDE.md or `rules/`
   ([plugins-reference](https://code.claude.com/docs/en/plugins-reference#standard-layout));
   a skill with `paths` loads on the same files

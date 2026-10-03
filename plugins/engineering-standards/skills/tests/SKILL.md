@@ -1,7 +1,7 @@
 ---
 name: tests
 user-invocable: false
-description: Use when writing, changing or reviewing tests — whether a test can fail for the right reason, mocks and test doubles, contract tests for external dependencies, running before claiming done.
+description: What makes a test worth keeping: it can fail for the right reason, mocks are not the thing under test, external dependencies get a contract test, and code runs before it is called done. Use when writing, changing or reviewing tests.
 paths:
   - "**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}"
   - "**/*_test.go"

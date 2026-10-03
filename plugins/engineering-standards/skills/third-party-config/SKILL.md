@@ -1,7 +1,7 @@
 ---
 name: third-party-config
 user-invocable: false
-description: Use when writing or changing a third-party tool's config file — ESLint, TypeScript, Next.js, Vite, Tailwind, Turborepo, Drizzle, GitHub Actions, Renovate, Dependabot, CodeRabbit, Docker, pnpm workspace — or bumping a major version.
+description: Documentation-first rule for third-party config files (ESLint, TypeScript, Next.js, Vite, Tailwind, Turborepo, Drizzle, GitHub Actions, Renovate, Dependabot, CodeRabbit, Docker, pnpm workspace): read and cite the docs of the installed version. Use when writing or changing such a file or bumping a major version.
 paths:
   - "**/eslint.config.*"
   - "**/tsconfig*.json"
