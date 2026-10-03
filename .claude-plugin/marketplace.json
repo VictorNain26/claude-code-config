@@ -1,12 +1,12 @@
 {
-  "name": "team-config",
-  "description": "Team plugins for Claude Code",
-  "owner": { "name": "Team" },
+  "name": "claude-code-config",
+  "description": "Plugins shipped with the claude-code-config environment",
+  "owner": { "name": "VictorNain26", "url": "https://github.com/VictorNain26" },
   "plugins": [
     {
-      "name": "team-standards",
-      "source": "./plugins/team-standards",
-      "description": "Team defaults loaded by file path: UI design and honest tests"
+      "name": "engineering-standards",
+      "source": "./plugins/engineering-standards",
+      "description": "Engineering defaults that load by file path: UI work, tests, third-party config files"
     }
   ]
 }

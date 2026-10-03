@@ -1,138 +1,292 @@
 # claude-code-config
 
-La configuration Claude Code commune à l'équipe : ce qui doit être identique
-sur chaque machine. Les préférences de chacun restent dans sa propre couche
-(`~/.claude/`), que ce dépôt ne touche pas.
+A ready-to-use [Claude Code](https://code.claude.com/docs) environment you opt
+into: safe permission defaults, shared working rules, and skills that load
+only on the files they apply to. Install it once; `git pull` keeps it current.
 
-## Ce qui est commun
+Use it as is, or fork it for your team.
 
-| Fichier | Rôle | Livré comme |
+## What you get
+
+| Path | Contents | How Claude Code loads it |
 |---|---|---|
-| `policy/managed-settings.json` | permissions (allow d'outillage en lecture, ask pour l'irréversible, deny pour les secrets), attribution des commits et PR, marketplace et plugin d'équipe | [managed settings](https://code.claude.com/docs/en/managed-settings) |
-| `policy/CLAUDE.md` | instructions communes | [CLAUDE.md managé](https://code.claude.com/docs/en/memory) : chargé dans chaque session, impossible à exclure |
-| `plugins/team-standards/` | skills chargées par chemin de fichier : `ui-design` (front), `tests` (fichiers de test) | plugin, depuis la marketplace `team-config` de ce dépôt (`.claude-plugin/marketplace.json`) |
+| `config/settings.json` | permissions, bypass mode disabled, the plugin below | a settings file linked into the managed-settings drop-in directory ([managed-settings](https://code.claude.com/docs/en/managed-settings)) |
+| `config/CLAUDE.md` | working rules: reuse before writing, verify before claiming, code and git conventions | imported from your own `~/.claude/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)) |
+| `plugins/engineering-standards/` | skills `ui-design`, `tests`, `third-party-config`, each loaded when Claude reads or edits matching files | plugin from this repository's marketplace |
 
-Les managed settings sont au-dessus de tout autre niveau : un développeur ne
-peut ni les retirer ni les contredire. Les listes (`permissions.allow`, `ask`,
-`deny`, `autoMode.*`) se combinent avec les siennes au lieu de les remplacer
-([settings](https://code.claude.com/docs/en/settings), « combines the lists
-instead of picking one »).
+Permissions, in short:
 
-## Installer
+- **allow without asking**: test, lint, build, format, typecheck and dev
+  scripts of pnpm and bun, pytest/ruff/mypy through uv; installing from the
+  lockfile (`pnpm install`, `bun install`, `uv sync`, all without a package
+  argument); `git fetch`, `git pull`, commits, cherry-picks, new branches and
+  worktrees; read-only `gh` and `glab`; Docker builds, logs and inspection.
+  Read-only git and shell commands need no rule: Claude Code runs them without
+  a prompt ([permissions](https://code.claude.com/docs/en/permissions)).
+- **ask first**: pushes and merges; `reset --hard`, `clean -f`, recursive
+  `rm`, branch and tag deletion, interactive rebase, `--amend`, `--no-verify`,
+  `git add -A`; adding, removing or upgrading a dependency; `dlx`/`bunx`;
+  `docker exec`; publishing; PR/MR creation, merge and close; reading or
+  editing a project `.npmrc`; editing shell startup files.
+- **deny**: secret files — in the project, `.env` and `.env.*` (templates
+  such as `.env.example`, `.sample`, `.template`, `.dist` stay readable),
+  `.envrc`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, `secrets.*`; in your
+  home directory, `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.azure`, `~/.kube`, the `gh`
+  and `gcloud` configs, `~/.docker/config.json`, `~/.git-credentials`,
+  `~/.netrc`, `~/.npmrc`, `~/.pypirc`, `~/.claude/.credentials.json`. Claude
+  can't read, create or edit them; you do. Also `mkfs`, `dd`, `chmod 777`.
 
-**Avant tout déploiement**, ce dépôt doit être clonable par chaque poste :
-la marketplace `team-config` est clonée par git sur la machine de chacun, avec
-ses identifiants, sans invite ([plugins/org](https://code.claude.com/docs/en/plugins/org),
-« each user needs read access to it »). Le placer dans l'organisation de
-l'entreprise (ou le rendre public), puis mettre son adresse dans
-`extraKnownMarketplaces.team-config.source` (voir [Adapter à l'entreprise](#adapter-à-lentreprise)).
+In auto mode, Claude Code drops broad allow rules such as package-manager run
+commands and lets its classifier decide instead
+([permission-modes](https://code.claude.com/docs/en/permission-modes)), so
+some "allow" entries only save prompts in the other modes.
 
-Une seule voie par organisation : quand les managed settings du serveur
-livrent une clé, Claude Code ignore par défaut le fichier local
-([managed-settings](https://code.claude.com/docs/en/managed-settings),
-`managedSourcesBehavior`).
+## Requirements
 
-### Organisation Claude Team ou Enterprise
+- [Claude Code](https://code.claude.com/docs/en/setup), recent; tested with 2.1.288.
+- `git`. Administrator rights for the settings link (see
+  [without admin rights](#without-admin-rights) otherwise).
+- A machine whose organization pushes its own managed settings (claude.ai
+  console or MDM) ignores this drop-in by default: Claude Code applies only the
+  highest-ranked managed source
+  ([managed-settings](https://code.claude.com/docs/en/managed-settings)). Use
+  [without admin rights](#without-admin-rights) there.
 
-Un Owner colle le résultat de cette commande dans
-[Admin Settings > Claude Code > Managed settings](https://claude.ai/admin-settings/claude-code) :
+## Install
+
+Clone the repository where it will stay — the install points at this
+directory:
 
 ```bash
-jq --rawfile md policy/CLAUDE.md 'del(."$schema") + {claudeMd: $md}' policy/managed-settings.json
+git clone https://github.com/VictorNain26/claude-code-config.git
+cd claude-code-config
 ```
 
-Rien à installer sur les postes. `claude doctor` affiche la ligne
-`Managed settings (remote)` ([server-managed-settings](https://code.claude.com/docs/en/server-managed-settings)).
+**1. Settings** — link `config/settings.json` into the drop-in directory.
 
-### Tout autre compte (Pro, Max, clé API) ou poste géré à la main
-
-Depuis un clone du dépôt, avec les droits administrateur :
+Linux and WSL:
 
 ```bash
-# Linux et WSL
-sudo install -Dm644 policy/managed-settings.json /etc/claude-code/managed-settings.d/50-team.json
-sudo install -Dm644 policy/CLAUDE.md /etc/claude-code/CLAUDE.md
+sudo mkdir -p /etc/claude-code/managed-settings.d
+sudo ln -sf "$PWD/config/settings.json" /etc/claude-code/managed-settings.d/50-claude-code-config.json
 ```
 
+macOS:
+
 ```bash
-# macOS
-D="/Library/Application Support/ClaudeCode"
-sudo install -d "$D/managed-settings.d"
-sudo install -m644 policy/managed-settings.json "$D/managed-settings.d/50-team.json"
-sudo install -m644 policy/CLAUDE.md "$D/CLAUDE.md"
+D="/Library/Application Support/ClaudeCode/managed-settings.d"
+sudo mkdir -p "$D"
+sudo ln -sf "$PWD/config/settings.json" "$D/50-claude-code-config.json"
 ```
+
+Windows, PowerShell as administrator (a copy: run it again after each
+`git pull`):
 
 ```powershell
-# Windows, PowerShell en administrateur
-$D = "C:\Program Files\ClaudeCode"
-New-Item -ItemType Directory -Force "$D\managed-settings.d" | Out-Null
-Copy-Item policy\managed-settings.json "$D\managed-settings.d\50-team.json"
-Copy-Item policy\CLAUDE.md "$D\CLAUDE.md"
+$D = "C:\Program Files\ClaudeCode\managed-settings.d"
+New-Item -ItemType Directory -Force $D | Out-Null
+Copy-Item config\settings.json "$D\50-claude-code-config.json"
 ```
 
-Le fichier va dans `managed-settings.d/` pour cohabiter avec une politique
-d'entreprise. Claude Code fusionne `managed-settings.json` puis les fichiers de
-`managed-settings.d/` par ordre alphabétique ; pour une valeur simple, le
-dernier l'emporte, donc `50-team.json` passe devant `managed-settings.json`. Si
-la politique d'entreprise doit gagner, elle va dans un fichier au préfixe plus
-haut (`90-company.json`). Un profil MDM ou une clé de registre HKLM, s'il
-existe, masque ces fichiers sans avertissement
-([managed-settings](https://code.claude.com/docs/en/managed-settings)).
-Mise à jour : `git pull` puis les mêmes commandes.
+**2. Working rules** — import `config/CLAUDE.md` from your own CLAUDE.md.
+Spaces in the path must be escaped with a backslash, or the import is ignored
+([memory](https://code.claude.com/docs/en/memory#import-additional-files)).
 
-### Parc sous MDM
+macOS, Linux and WSL:
 
-Sur macOS, les clés de `policy/managed-settings.json` se convertissent en
-profil `com.anthropic.claudecode` (objets en dictionnaires, listes en tableaux
-plist) ; sur Windows, le JSON entier va en chaîne dans la valeur
-`HKLM\SOFTWARE\Policies\ClaudeCode\Settings`. `policy/CLAUDE.md` va au chemin
-système ci-dessus ([managed-settings](https://code.claude.com/docs/en/managed-settings), « Delivery mechanisms »).
+```bash
+mkdir -p ~/.claude
+printf '\n@%s/config/CLAUDE.md\n' "$(pwd | sed 's/ /\\ /g')" >> ~/.claude/CLAUDE.md
+```
 
-### Vérifier
+Windows PowerShell:
 
-- `/status` : `Enterprise managed settings` figure dans `Setting sources`, avec
-  `(file + drop-ins)` pour une installation par fichier ; aucune ligne
-  `Skipped sources` ne doit nommer ce fichier.
-- `/plugin` : `team-standards@team-config` est installé et activé.
-- `claude auto-mode config` : les règles effectives.
+```powershell
+New-Item -ItemType Directory -Force "$HOME\.claude" | Out-Null
+$p = (Get-Location).Path -replace '\\','/' -replace ' ','\ '
+Add-Content -Encoding utf8 "$HOME\.claude\CLAUDE.md" "`n@$p/config/CLAUDE.md"
+```
 
-## Adapter à l'entreprise
+**3. Start Claude Code.** The first session registers the marketplace and
+installs the plugin.
 
-- **Forge.** La marketplace pointe vers ce dépôt sur GitHub
-  (`extraKnownMarketplaces.team-config.source`). Si le dépôt part sur GitLab ou
-  ailleurs : `{"source": "git", "url": "https://gitlab.example.com/groupe/claude-code-config.git"}`.
-  Les permissions couvrent `gh` (GitHub) et `glab` (GitLab) : lecture
-  autorisée, création et merge de PR/MR en `ask`.
-- **Mode auto.** Par défaut, le classifieur ne fait confiance qu'au dépôt de
-  travail et à ses remotes. Quand l'organisation est connue, ajouter dans
-  `policy/managed-settings.json` un bloc `autoMode.environment` qui commence
-  par `"$defaults"` puis nomme l'organisation, la forge, les domaines et
-  services internes ([auto-mode-config](https://code.claude.com/docs/en/auto-mode-config),
-  « Define trusted infrastructure »). Les machines et réseaux de chacun vont
-  dans son propre `~/.claude/settings.json`.
+**Optional — Context7.** `config/CLAUDE.md` tells Claude to look library
+documentation up in [Context7](https://github.com/upstash/context7) when it is
+installed. It is a hosted MCP server: the library names and questions go to
+Upstash. To add it:
 
-## La couche de chacun
+```bash
+claude plugin install context7@claude-plugins-official
+```
 
-Dans `~/.claude/settings.json` et `~/.claude/CLAUDE.md`, à la main ou avec son
-propre outil de dotfiles :
+### Without admin rights
 
-- préférences : `language`, `theme`, `effortLevel`, `statusLine`, notifications ;
-- mode par défaut (`permissions.defaultMode`), autorisations de lecture web,
-  MCP perso ;
-- `autoMode` qui décrit ses machines, son réseau, ses dépôts perso.
+Copy the keys of `config/settings.json` into `~/.claude/settings.json`,
+appending to the lists already there, and do step 2. Repeat the copy when
+`config/settings.json` changes.
 
-## Choix
+### For an organization
 
-- **`ask` plutôt que `deny` pour l'irréversible.** Un `deny` managé ne se lève
-  à aucun niveau, même sur demande explicite, et pousse Claude vers des
-  contournements ; `policy/CLAUDE.md` demande de confirmer ces actions, `ask`
-  le fait ([permissions](https://code.claude.com/docs/en/permissions)).
-- **Secrets : `deny` en Read et Edit, pas de hook.** Ces règles couvrent les
-  lectures et écritures de Claude lui-même, y compris `cat`/`head`/`tail`/`sed`
-  dans Bash, pas un script ou un conteneur qui lit le fichier
-  ([permissions](https://code.claude.com/docs/en/permissions)) ; le
-  [sandbox](https://code.claude.com/docs/en/sandboxing) est la vraie barrière.
-  Un hook de masquage gitleaks coûtait ~0,55 s par appel d'outil.
-- **Règles par chemin en skills.** Un plugin ne charge ni CLAUDE.md ni
-  `rules/` ; une skill avec `paths` se charge sur les mêmes fichiers
+A drop-in linked to a user-writable clone is a convenience, not enforcement.
+To enforce the configuration across a fleet, [fork](#make-it-yours) the
+repository first — otherwise every machine follows this one's plugin updates —
+or pin the marketplace `source` to a tag with `ref`
+([marketplace-reference](https://code.claude.com/docs/en/plugins/marketplace-reference#marketplace-sources)).
+Then:
+
+- **Claude Team or Enterprise**: an Owner pastes the output of this command into
+  [Admin Settings > Claude Code > Managed settings](https://claude.ai/admin-settings/claude-code):
+
+  ```bash
+  jq --rawfile md config/CLAUDE.md 'del(."$schema") + {claudeMd: $md}' config/settings.json
+  ```
+
+  Machines that sign in another way (another organization's API key,
+  Bedrock, Vertex, a custom base URL) don't fetch it: give them the file
+  install too ([admin-setup](https://code.claude.com/docs/en/admin-setup)).
+- **File or MDM**: copy `config/settings.json` into `managed-settings.d/` and
+  `config/CLAUDE.md` to the managed CLAUDE.md path (`/etc/claude-code/CLAUDE.md`,
+  `/Library/Application Support/ClaudeCode/CLAUDE.md`,
+  `C:\Program Files\ClaudeCode\CLAUDE.md`), or deliver them through MDM
+  ([managed-settings](https://code.claude.com/docs/en/managed-settings)).
+
+## Verify
+
+- `claude doctor` reports no `Invalid settings` for the linked file.
+- In a session, `/status` lists `Enterprise managed settings` under
+  `Setting sources` with `(drop-ins)`, and no `Skipped sources` line names it.
+- `/plugin` shows `engineering-standards@claude-code-config` installed and
+  enabled.
+- Ask Claude what its working rules say about reusing existing tools: it
+  quotes the "Don't reinvent the wheel" section of `config/CLAUDE.md`.
+
+## Update
+
+```bash
+git pull
+```
+
+Settings and working rules follow the clone at the next session (copy again
+on Windows). The plugin updates in the background and the new version loads at
+the following launch
+([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). Changes
+are listed in the
+[commit history](https://github.com/VictorNain26/claude-code-config/commits/master).
+
+## Uninstall
+
+Remove the settings link, the plugin and its marketplace:
+
+```bash
+sudo rm /etc/claude-code/managed-settings.d/50-claude-code-config.json
+claude plugin marketplace remove claude-code-config
+```
+
+On macOS, remove `/Library/Application Support/ClaudeCode/managed-settings.d/50-claude-code-config.json`;
+on Windows, `Remove-Item "C:\Program Files\ClaudeCode\managed-settings.d\50-claude-code-config.json"`
+as administrator. Then delete the `@…/config/CLAUDE.md` line from
+`~/.claude/CLAUDE.md`.
+
+### Upgrading from the `team-config` layout
+
+Installs made before October 2026 used `managed-settings.d/50-team.json`, a
+copied managed `CLAUDE.md` and the `team-config` marketplace. Remove them, then
+install as above:
+
+```bash
+sudo rm /etc/claude-code/managed-settings.d/50-team.json /etc/claude-code/CLAUDE.md
+claude plugin marketplace remove team-config
+```
+
+## Make it yours
+
+- **Your preferences** — language, theme, effort, status line, default
+  permission mode, your own MCP servers — go in `~/.claude/settings.json` and
+  `~/.claude/CLAUDE.md`. Lists combine across files
+  ([settings](https://code.claude.com/docs/en/settings)): you can add `allow`,
+  `ask` and `deny` rules, and yours apply alongside these.
+- **Auto mode** only trusts the working repository and its remotes. Describe
+  your source-control org, internal domains and services in `autoMode.environment`,
+  starting with `"$defaults"`
+  ([auto-mode-config](https://code.claude.com/docs/en/auto-mode-config#define-trusted-infrastructure)).
+- **Stack-specific permissions** belong in each project's committed
+  `.claude/settings.json`.
+- **A fork for your team**: point `extraKnownMarketplaces.claude-code-config.source`
+  at it — `{"source": "github", "repo": "your-org/claude-code-config"}`, or for
+  GitLab and other hosts `{"source": "git", "url": "https://gitlab.example.com/group/claude-code-config.git"}`
+  ([marketplace-reference](https://code.claude.com/docs/en/plugins/marketplace-reference#marketplace-sources)).
+  A private fork needs git read access without a prompt on every machine, for
+  example `gh auth login && gh auth setup-git`
+  ([host-marketplace](https://code.claude.com/docs/en/plugins/host-marketplace)).
+
+### Optional: sandbox
+
+The [sandbox](https://code.claude.com/docs/en/sandboxing) enforces file and
+network limits on shell commands at the OS level, which permission rules can't
+do for scripts and subprocesses. It isn't enabled here because it needs
+per-machine setup and can break Docker and dev servers until tuned. To try it:
+
+1. Linux and WSL2: `sudo apt-get install bubblewrap socat` (or `dnf`); on
+   Ubuntu 24.04+, follow the AppArmor step in the sandboxing page. macOS needs
+   nothing. Native Windows and WSL1 are not supported.
+2. Add `"sandbox": {"enabled": true}` to `~/.claude/settings.json`.
+3. Run `/sandbox` to check dependencies and status.
+
+## Design decisions
+
+- **Settings as a drop-in, rules as an import.** The drop-in directory is the
+  only native way to include a settings file whole, so an update replaces it
+  instead of merging into yours; a CLAUDE.md import does the same for
+  instructions. Both follow `git pull`.
+- **`ask` rather than `deny`.** The drop-in sits at the managed level, and "if
+  a tool is denied at any level, no other level can allow it"
+  ([permissions](https://code.claude.com/docs/en/permissions)): a `deny` would
+  block even an explicit request. `ask` prompts instead, in auto mode too.
+  Secret files are the exception: only a `deny` also covers `cat`, `head` and
+  the like in Bash — an `ask` rule on `.env` let `cat .env` through in a test
+  on 2.1.288 — and a `Read` deny also blocks editing and creating the file
+  (same page).
+- **Exact forms for commands that take arguments.** A rule matches by prefix,
+  so `git fetch*` would also allow `git fetch --upload-pack=<command>` and
+  `pnpm install*` would allow `pnpm install <package>`. Those commands are
+  allowed only without arguments.
+- **Dependency changes ask.** `config/CLAUDE.md` requires vetting every new
+  dependency; the prompt is where that happens.
+- **Secrets are guarded by rules, not hooks.** `Read` deny rules cover
+  Claude's own reads, including `cat`, `head`, `tail` and `sed` in Bash, not a
+  script or container that opens the file — that is the sandbox's job. A secret-masking
+  hook was measured at ~0.55 s per tool call and rejected.
+- **Bypass mode is disabled** (`disableBypassPermissionsMode`, as in
+  Anthropic's managed-settings examples): skipping every check would void the
+  rest.
+- **Skills instead of rules.** A plugin can't ship CLAUDE.md or `rules/`
+  ([plugins-reference](https://code.claude.com/docs/en/plugins-reference#standard-layout));
+  a skill with `paths` loads on the same files
   ([skills](https://code.claude.com/docs/en/skills)).
+- **No hooks, agents or MCP servers forced on you.** Each one runs code, costs
+  latency or widens what leaves the machine; Context7 stays an opt-in step.
+
+## Troubleshooting
+
+- **Claude Code refuses to start and names a managed file**: the file isn't
+  valid JSON — `git pull` may have stopped mid-merge; fix the clone.
+- **A rule seems ignored**: `claude doctor` lists the entries it dropped.
+- **The plugin doesn't install**: `claude plugin marketplace list` and the
+  Errors tab of `/plugin`; for a private fork, check git access.
+- **The settings have no effect**: another managed source wins on that
+  machine; `/status` shows it under `Skipped sources`.
+- **The clone moved or was deleted**: the link now points nowhere; Claude Code
+  starts without these settings (tested with 2.1.288). Recreate the link from
+  the new location, or remove it.
+
+## Contributing
+
+Changes go through pull requests; CI runs `claude plugin validate --strict`
+and checks every JSON file. A change to a skill bumps `version` in
+`plugins/engineering-standards/.claude-plugin/plugin.json` — installed copies
+stay on the old version until it changes — then
+`claude plugin tag plugins/engineering-standards --push` tags the release.
+
+## License
+
+[MIT](LICENSE)
