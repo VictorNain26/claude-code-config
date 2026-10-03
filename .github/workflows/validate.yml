@@ -44,6 +44,7 @@ jobs:
         run: |
           sudo mkdir -p /etc/claude-code/managed-settings.d
           sudo ln -s "$GITHUB_WORKSPACE/config/settings.json" /etc/claude-code/managed-settings.d/50-claude-code-config.json
+          sudo ln -s "$GITHUB_WORKSPACE/config/sandbox.json" /etc/claude-code/managed-settings.d/51-claude-code-config-sandbox.json
           claude doctor < /dev/null | tee doctor.txt
           grep -q "Claude Code doctor" doctor.txt
           if grep -q "Invalid settings" doctor.txt; then exit 1; fi
