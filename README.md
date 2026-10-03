@@ -102,9 +102,12 @@ sudo ln -sf "$PWD/config/sandbox.json" /etc/claude-code/managed-settings.d/51-cl
 # macOS: same link in "/Library/Application Support/ClaudeCode/managed-settings.d"
 ```
 
-Skip this step on WSL2 for now: with Claude Code 2.1.288, the first network
+Tested on Ubuntu 24.04 with Claude Code 2.1.288: allowed hosts connect,
+other hosts are refused, writes outside the project and reads of the denied
+secret files fail. Skip this step on WSL2 for now: there, the first network
 connection of each sandboxed command fails (`Failed to connect to localhost
-port 3128`), so `git fetch` and similar commands fail at random. Skip it on
+port 3128`), so `git fetch` and similar commands fail at random; the bug is
+reported to Anthropic. Skip it on
 native Windows and WSL1, where the sandbox doesn't run. Without the link, the
 permission rules still apply.
 
