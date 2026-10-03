@@ -108,7 +108,7 @@ Add-Content -Encoding utf8 "$HOME\.claude\CLAUDE.md" "`n@$p/config/CLAUDE.md"
 ```
 
 **3. Start Claude Code.** The first session registers the marketplace and
-installs the plugin.
+installs the plugin; it loads from the next start.
 
 **Optional — Context7.** `config/CLAUDE.md` tells Claude to look library
 documentation up in [Context7](https://github.com/upstash/context7) when it is
