@@ -196,8 +196,8 @@ per-machine setup and can break Docker and dev servers until tuned. To try it:
   ([plugins-reference](https://code.claude.com/docs/en/plugins-reference#standard-layout));
   a skill with `paths` loads on the same files
   ([skills](https://code.claude.com/docs/en/skills)).
-- **Sparse marketplace checkout.** Machines clone only `.claude-plugin/` and
-  `plugins/` (`sparsePaths`).
+- **Sparse marketplace checkout.** Machines check out `.claude-plugin/`,
+  `plugins/` and the root files, not `policy/` or `.github/` (`sparsePaths`).
 
 ## Troubleshooting
 
