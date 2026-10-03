@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: ui-disabled-state-tokens
+description: Adding a disabled state to a component styled with design tokens. The ui-design skill should load and the change should use tokens, not hardcoded colors.
+context:
+  scaffold_script: scaffold.sh
