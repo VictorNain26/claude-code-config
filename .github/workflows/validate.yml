@@ -21,7 +21,7 @@ jobs:
 
       - name: Check JSON syntax
         run: |
-          for f in config/settings.json .claude-plugin/marketplace.json plugins/*/.claude-plugin/plugin.json; do
+          for f in config/*.json .claude-plugin/marketplace.json plugins/*/.claude-plugin/plugin.json; do
             jq empty "$f"
           done
 

@@ -17,10 +17,11 @@ or ill-suited is not the answer.
 
 ## Verify before claiming
 
-Never state an API, a behavior or a config field from memory: either say you
-are checking the documentation, read it and cite the URL and the field, or say
-you don't know. This is mandatory for non-trivial SDK usage, code that talks to
-an external API, a major version bump and the first use of an SDK in a project.
+For non-trivial SDK usage, code that talks to an external API, a third-party
+config file, a major version bump and the first use of an SDK in a project,
+don't state an API, a behavior or a config field from memory: read the
+documentation and cite the URL and the field, or say you don't know.
+Elsewhere, say when you are unsure instead of guessing.
 
 Sources, in this order: Context7 MCP when it is installed, the official
 documentation, the type definitions of the installed version, web search last.
