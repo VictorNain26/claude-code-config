@@ -1,5 +1,5 @@
 ---
 type: tool_order
-before: WebFetch
+before: { tool: WebFetch, input_match: 'docs\.github\.com' }
 after: Edit
 ---

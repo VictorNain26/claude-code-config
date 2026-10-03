@@ -1,5 +1,5 @@
 schema_version: "1.1"
 name: config-create-new
-description: Creating a GitHub Actions workflow from scratch. Checks whether third-party-config loads before the first write, since its paths only match once a matching file is touched.
+description: Creating a GitHub Actions workflow from scratch. Checks that third-party-config loads before the first write (its paths only match once a matching file is touched), that docs are read first, and that the workflow runs pnpm test on pull requests.
 context:
   scaffold_script: scaffold.sh

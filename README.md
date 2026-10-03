@@ -323,9 +323,10 @@ claude plugin marketplace remove team-config
 
 Changes go through pull requests; CI runs `claude plugin validate --strict`
 and checks every JSON file. The skills have a `claude plugin eval` suite in
-`plugins/engineering-standards/evals/`, run in CI on `opus` and `sonnet` on
-plugin changes and every week, so a model change that stops a skill from
-loading shows up ([plugin-evals](https://code.claude.com/docs/en/plugin-evals)). A change to a skill bumps `version` in
+`plugins/engineering-standards/evals/`, run in CI on `opus` and `sonnet` when
+the plugin changes and every week. Each case fails when its skill stops
+loading, so a model or Claude Code change that breaks a skill shows up
+([plugin-evals](https://code.claude.com/docs/en/plugin-evals)). A change to a skill bumps `version` in
 `plugins/engineering-standards/.claude-plugin/plugin.json` — installed copies
 stay on the old version until it changes — then
 `claude plugin tag plugins/engineering-standards --push` tags the release.

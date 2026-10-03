@@ -1,5 +1,5 @@
 ---
 type: tool_order
-before: WebFetch
+before: { tool: WebFetch, input_match: 'docs\.github\.com|pnpm\.io|github\.com/pnpm' }
 after: Write
 ---
