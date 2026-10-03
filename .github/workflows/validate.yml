@@ -5,7 +5,7 @@ on:
   push:
     branches: [master]
   schedule:
-    - cron: "0 6 * * 1"
+    - cron: "17 6 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -40,11 +40,13 @@ jobs:
 
       # claude doctor exits 0 even when it reports invalid settings.
       - name: Check the settings as installed
+        shell: bash
         run: |
           sudo mkdir -p /etc/claude-code/managed-settings.d
           sudo ln -s "$GITHUB_WORKSPACE/config/settings.json" /etc/claude-code/managed-settings.d/50-claude-code-config.json
           claude doctor < /dev/null | tee doctor.txt
-          ! grep -q "Invalid settings" doctor.txt
+          grep -q "Claude Code doctor" doctor.txt
+          if grep -q "Invalid settings" doctor.txt; then exit 1; fi
 
   links:
     if: github.event_name != 'pull_request'

@@ -19,6 +19,13 @@ user's CLAUDE.md, and the plugins of `.claude-plugin/marketplace.json`.
   and `claude plugin validate ./plugins/engineering-standards --strict`.
 - A skill change bumps `version` in the plugin's `plugin.json`, otherwise
   installed copies stay on the old one; tag with `claude plugin tag`.
+- CI also runs weekly against the latest Claude Code. GitHub disables
+  scheduled workflows in a public repository after 60 days without activity:
+  re-enable it in the Actions tab if it stops.
+- A machine with the settings installed locks `engineering-standards` through
+  managed `enabledPlugins`, so `--plugin-dir` and `claude plugin eval` ignore a
+  local copy. Develop and evaluate the plugin on a machine without the link,
+  or in CI.
 - Every claim about a setting cites its page on code.claude.com/docs in the
   commit message.
 - No secret, no personal data.
