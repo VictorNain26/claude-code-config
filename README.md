@@ -11,7 +11,6 @@ Use it as is, or fork it for your team.
 | Path | Contents | How Claude Code loads it |
 |---|---|---|
 | `config/settings.json` | permissions, bypass mode disabled, the plugin below | a settings file linked into the managed-settings drop-in directory ([managed-settings](https://code.claude.com/docs/en/managed-settings)) |
-| `config/sandbox.json` | OS-level sandbox for shell commands, with registry and GitHub hosts allowed and read-only Docker commands excluded | a second drop-in, linked only where the sandbox works (see [step 1b](#install)) ([sandboxing](https://code.claude.com/docs/en/sandboxing)) |
 | `config/CLAUDE.md` | working rules: reuse before writing, verify before claiming, code and git conventions | imported from your own `~/.claude/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)) |
 | `plugins/engineering-standards/` | skills `ui-design`, `tests`, `third-party-config`, each loaded when Claude reads or edits matching files | plugin from this repository's marketplace |
 
@@ -58,12 +57,13 @@ some "allow" entries only save prompts in the other modes.
 
 ## Install
 
-Clone the repository where it will stay — the install points at this
-directory:
+Clone the repository into a directory you keep only for this install — the
+links point at it, so every checkout there is live in all your sessions. If
+you also work on the repository, do that in a second clone.
 
 ```bash
-git clone https://github.com/VictorNain26/claude-code-config.git
-cd claude-code-config
+git clone https://github.com/VictorNain26/claude-code-config.git ~/.local/share/claude-code-config
+cd ~/.local/share/claude-code-config
 ```
 
 **1. Settings** — link `config/settings.json` into the drop-in directory.
@@ -91,30 +91,6 @@ $D = "C:\Program Files\ClaudeCode\managed-settings.d"
 New-Item -ItemType Directory -Force $D | Out-Null
 Copy-Item config\settings.json "$D\50-claude-code-config.json"
 ```
-
-**1b. Sandbox — macOS and native Linux only.** Link `config/sandbox.json`
-next to the settings. On Linux, install `bubblewrap` and `socat` first
-(`sudo apt-get install bubblewrap socat`), and on Ubuntu 24.04+ follow the
-AppArmor step of the [sandboxing page](https://code.claude.com/docs/en/sandboxing).
-
-```bash
-sudo ln -sf "$PWD/config/sandbox.json" /etc/claude-code/managed-settings.d/51-claude-code-config-sandbox.json
-# macOS: same link in "/Library/Application Support/ClaudeCode/managed-settings.d"
-```
-
-Tested on Ubuntu 24.04 with Claude Code 2.1.288: allowed hosts connect,
-other hosts are refused, writes outside the project and reads of the denied
-secret files fail. Skip this step on WSL2 for now: there, the first network
-connection of each sandboxed command fails (`Failed to connect to localhost
-port 3128`), so `git fetch` and similar commands fail at random; the bug is
-reported to Anthropic. Skip it on
-native Windows and WSL1, where the sandbox doesn't run. Without the link, the
-permission rules still apply.
-
-With the sandbox on, a command can't reach a server started outside it, such
-as a dev server or a database in a container: on Linux a sandboxed command's
-`localhost` is its own. Claude Code then offers to rerun the command outside
-the sandbox, through your permission mode.
 
 **2. Working rules** — import `config/CLAUDE.md` from your own CLAUDE.md.
 Spaces in the path must be escaped with a backslash, or the import is ignored
@@ -206,7 +182,7 @@ are listed in the
 Remove the settings link, the plugin and its marketplace:
 
 ```bash
-sudo rm -f /etc/claude-code/managed-settings.d/50-claude-code-config.json /etc/claude-code/managed-settings.d/51-claude-code-config-sandbox.json
+sudo rm /etc/claude-code/managed-settings.d/50-claude-code-config.json
 claude plugin marketplace remove claude-code-config
 ```
 
@@ -247,6 +223,46 @@ claude plugin marketplace remove team-config
   example `gh auth login && gh auth setup-git`
   ([host-marketplace](https://code.claude.com/docs/en/plugins/host-marketplace)).
 
+### Optional: sandbox, for you to turn on
+
+The [sandbox](https://code.claude.com/docs/en/sandboxing) enforces file and
+network limits on shell commands at the OS level, including for scripts and
+`grep -r`, which permission rules can't cover. It also blocks things you may
+need: Docker, servers running outside it (on Linux a sandboxed command's
+`localhost` is its own), hosts you haven't allowed. So it isn't part of the
+shared settings: turn it on in your own `~/.claude/settings.json`, and switch
+it on or off at any time with `/sandbox`.
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "excludedCommands": [
+      "docker ps *", "docker logs *", "docker inspect *", "docker build *",
+      "docker compose ps *", "docker compose logs *", "docker compose config *",
+      "docker compose build *"
+    ],
+    "network": {
+      "allowedDomains": [
+        "registry.npmjs.org", "registry.yarnpkg.com", "pypi.org",
+        "files.pythonhosted.org", "github.com", "api.github.com",
+        "codeload.github.com", "objects.githubusercontent.com"
+      ]
+    }
+  }
+}
+```
+
+- **Linux**: install `bubblewrap` and `socat` (`sudo apt-get install bubblewrap
+  socat`); on Ubuntu 24.04+, add the AppArmor profile from the sandboxing page.
+  Tested on Ubuntu 24.04 with 2.1.288.
+- **WSL2**: not yet — with 2.1.288 the first network connection of each
+  sandboxed command fails (`Failed to connect to localhost port 3128`); the
+  bug is reported to Anthropic.
+- **Native Windows and WSL1**: the sandbox doesn't run.
+- When a command fails inside it, Claude Code offers to rerun it outside the
+  sandbox, through your permission mode.
+
 ## Design decisions
 
 - **Settings as a drop-in, rules as an import.** The drop-in directory is the
@@ -258,16 +274,17 @@ claude plugin marketplace remove team-config
   [auto mode](https://www.anthropic.com/engineering/claude-code-auto-mode),
   [How we contain Claude](https://www.anthropic.com/engineering/how-we-contain-claude)):
   a prompt on every push trains people to click through. `ask` is kept for
-  rare, irreversible or public actions; the classifier and the sandbox handle
-  the rest.
-- **Sandbox where it works.** It enforces file and network limits at the OS
-  level, including for scripts and `grep -r`, which permission rules can't
-  cover, and Anthropic measured 84% fewer prompts with it
-  ([Claude Code sandboxing](https://www.anthropic.com/engineering/claude-code-sandboxing)).
-  Prompt injection runs attacker commands in up to 84% of attempts on coding
-  agents ([Liu et al., 2025](https://arxiv.org/abs/2509.22040)), so a boundary
-  that doesn't depend on the model matters. It ships as a separate drop-in
-  because it doesn't work everywhere yet.
+  rare, irreversible or public actions; the auto-mode classifier handles the
+  rest, and the sandbox too where you turn it on.
+- **Sandbox recommended, not imposed.** It enforces file and network limits
+  at the OS level, including for scripts and `grep -r`, which permission rules
+  can't cover; Anthropic measured 84% fewer prompts with it
+  ([Claude Code sandboxing](https://www.anthropic.com/engineering/claude-code-sandboxing)),
+  and prompt injection runs attacker commands in up to 84% of attempts on
+  coding agents ([Liu et al., 2025](https://arxiv.org/abs/2509.22040)). But at
+  the managed level nobody could turn it off, and it blocks Docker, `gh` and
+  local servers until tuned: it belongs in each user's settings, behind
+  `/sandbox`.
 - **`ask` rather than `deny`.** The drop-in sits at the managed level, and "if
   a tool is denied at any level, no other level can allow it"
   ([permissions](https://code.claude.com/docs/en/permissions)): a `deny` would
@@ -285,7 +302,8 @@ claude plugin marketplace remove team-config
 - **Secrets are guarded by rules, not hooks.** `Read` deny rules cover
   Claude's own reads, including `cat`, `head`, `tail` and `sed` in Bash, not a
   script, a container or `grep -r` run from a parent directory — the sandbox
-  covers those, because Claude Code merges `Read` deny rules into it
+  covers those when you turn it on, because Claude Code merges `Read` deny
+  rules into it
   ([sandboxing](https://code.claude.com/docs/en/sandboxing)). A
   secret-masking hook was measured at ~0.55 s per tool call and rejected.
 - **Bypass mode is disabled** (`disableBypassPermissionsMode`, as in

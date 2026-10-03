@@ -22,6 +22,8 @@ user's CLAUDE.md, and the plugins of `.claude-plugin/marketplace.json`.
 - CI also runs weekly against the latest Claude Code. GitHub disables
   scheduled workflows in a public repository after 60 days without activity:
   re-enable it in the Actions tab if it stops.
+- Never develop in the clone your machine's links point at: every checkout
+  there is live in all your sessions. Work in a second clone or a worktree.
 - A machine with the settings installed locks `engineering-standards` through
   managed `enabledPlugins`, so `--plugin-dir` and `claude plugin eval` ignore a
   local copy. Develop and evaluate the plugin on a machine without the link,
