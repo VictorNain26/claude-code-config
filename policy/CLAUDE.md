@@ -1,9 +1,9 @@
 <!--
-Préférences transversales, chargées à chaque session et à chaque requête.
-Les règles propres à un projet vivent dans son CLAUDE.md ; celles qui ne
-servent que sur un type de fichier vivent dans ~/.claude/rules/ avec un
-frontmatter `paths` et ne coûtent alors du contexte qu'à l'ouverture d'un
-fichier concerné.
+Instructions communes à l'équipe, chargées à chaque session. Les règles
+propres à un projet vivent dans son CLAUDE.md ; celles qui ne servent que sur
+un type de fichier vivent dans les skills du plugin team-standards, avec un
+frontmatter `paths`, et ne coûtent du contexte qu'à l'ouverture d'un fichier
+concerné. Les préférences de chacun vont dans son ~/.claude/CLAUDE.md.
 
 Critère d'ajout, à passer sur chaque ligne : est-ce que retirer cette ligne me
 ferait faire une erreur ? Sinon, elle sort. Ce que le system prompt de Claude
@@ -51,7 +51,7 @@ Obligatoire avant d'écrire une config tierce (`eslint.config.*`,
 API externe. Aussi : tout bump majeur, tout premier usage d'un SDK dans un
 projet.
 
-Sources, dans cet ordre : Context7 MCP, puis la doc officielle en WebFetch, puis
+Sources, dans cet ordre : Context7 MCP s'il est installé, puis la doc officielle en WebFetch, puis
 les `.d.ts` de la version installée dans `node_modules`, puis WebSearch en
 dernier recours. Le commit qui modifie une config cite sa source.
 
