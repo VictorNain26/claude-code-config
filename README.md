@@ -27,13 +27,19 @@ Permissions, in short:
   `rm`, branch and tag deletion, interactive rebase, `--amend`, `--no-verify`,
   `git add -A`; adding, removing or upgrading a dependency; `dlx`/`bunx`;
   `docker exec`; publishing; PR/MR creation, merge and close; reading or
-  editing project secret files (`.env*` except `.env.example`, `.envrc`,
-  `.npmrc`, keys, `credentials.json`, `secrets.*`); editing shell startup files.
-- **deny**: reading or editing credential stores in your home directory —
-  `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.azure`, `~/.kube`, the `gh` and `gcloud`
-  configs, `~/.docker/config.json`, `~/.git-credentials`, `~/.netrc`,
-  `~/.npmrc`, `~/.pypirc`, `~/.claude/.credentials.json` — and `mkfs`, `dd`,
-  `chmod 777`.
+  editing a project `.npmrc`; editing shell startup files.
+- **deny**: secret files — in the project, `.env` and `.env.*` (templates
+  such as `.env.example`, `.sample`, `.template`, `.dist` stay readable),
+  `.envrc`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, `secrets.*`; in your
+  home directory, `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.azure`, `~/.kube`, the `gh`
+  and `gcloud` configs, `~/.docker/config.json`, `~/.git-credentials`,
+  `~/.netrc`, `~/.npmrc`, `~/.pypirc`, `~/.claude/.credentials.json`. Claude
+  can't read, create or edit them; you do. Also `mkfs`, `dd`, `chmod 777`.
+
+In auto mode, Claude Code drops broad allow rules such as package-manager run
+commands and lets its classifier decide instead
+([permission-modes](https://code.claude.com/docs/en/permission-modes)), so
+some "allow" entries only save prompts in the other modes.
 
 ## Requirements
 
@@ -236,17 +242,19 @@ per-machine setup and can break Docker and dev servers until tuned. To try it:
   a tool is denied at any level, no other level can allow it"
   ([permissions](https://code.claude.com/docs/en/permissions)): a `deny` would
   block even an explicit request. `ask` prompts instead, in auto mode too.
-  Only home-directory credential stores, which no task needs, are denied — and
-  a `Read` deny also blocks editing and creating the file (same page).
+  Secret files are the exception: only a `deny` also covers `cat`, `head` and
+  the like in Bash — an `ask` rule on `.env` let `cat .env` through in a test
+  on 2.1.288 — and a `Read` deny also blocks editing and creating the file
+  (same page).
 - **Exact forms for commands that take arguments.** A rule matches by prefix,
   so `git fetch*` would also allow `git fetch --upload-pack=<command>` and
   `pnpm install*` would allow `pnpm install <package>`. Those commands are
   allowed only without arguments.
 - **Dependency changes ask.** `config/CLAUDE.md` requires vetting every new
   dependency; the prompt is where that happens.
-- **Secrets are guarded by rules, not hooks.** `Read` rules cover Claude's own
-  reads, including `cat`, `head`, `tail` and `sed` in Bash, not a script or
-  container that opens the file — that is the sandbox's job. A secret-masking
+- **Secrets are guarded by rules, not hooks.** `Read` deny rules cover
+  Claude's own reads, including `cat`, `head`, `tail` and `sed` in Bash, not a
+  script or container that opens the file — that is the sandbox's job. A secret-masking
   hook was measured at ~0.55 s per tool call and rejected.
 - **Bypass mode is disabled** (`disableBypassPermissionsMode`, as in
   Anthropic's managed-settings examples): skipping every check would void the
