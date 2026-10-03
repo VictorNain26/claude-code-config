@@ -1,0 +1,6 @@
+{
+  "name": "team-standards",
+  "version": "1.0.0",
+  "description": "Team defaults loaded by file path: UI design and honest tests",
+  "author": { "name": "Team" }
+}

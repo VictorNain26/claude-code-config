@@ -1,0 +1,12 @@
+{
+  "name": "team-config",
+  "description": "Team plugins for Claude Code",
+  "owner": { "name": "Team" },
+  "plugins": [
+    {
+      "name": "team-standards",
+      "source": "./plugins/team-standards",
+      "description": "Team defaults loaded by file path: UI design and honest tests"
+    }
+  ]
+}

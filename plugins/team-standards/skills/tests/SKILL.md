@@ -1,4 +1,6 @@
 ---
+name: tests
+user-invocable: false
 description: Ce qui rend un test honnête — chargé en ouvrant un fichier de test
 paths:
   - "**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs,py,go,rs}"

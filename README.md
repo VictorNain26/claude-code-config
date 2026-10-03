@@ -1,83 +1,138 @@
 # claude-code-config
 
-Le harness Claude Code de niveau utilisateur (`~/.claude/`), une seule source
-pour toutes les machines, déployée par [chezmoi](https://www.chezmoi.io/).
+La configuration Claude Code commune à l'équipe : ce qui doit être identique
+sur chaque machine. Les préférences de chacun restent dans sa propre couche
+(`~/.claude/`), que ce dépôt ne touche pas.
 
-## Contenu
+## Ce qui est commun
 
-| Source | Cible |
-|---|---|
-| `home/dot_claude/CLAUDE.md` | `~/.claude/CLAUDE.md` — instructions globales |
-| `home/dot_claude/rules/` | `~/.claude/rules/` — règles chargées par chemin |
-| `home/dot_claude/modify_private_settings.json` + `home/.chezmoidata/claude.json` | `~/.claude/settings.json` (0600), clés du dépôt seulement |
+| Fichier | Rôle | Livré comme |
+|---|---|---|
+| `policy/managed-settings.json` | permissions (allow d'outillage en lecture, ask pour l'irréversible, deny pour les secrets), attribution des commits et PR, marketplace et plugin d'équipe | [managed settings](https://code.claude.com/docs/en/managed-settings) |
+| `policy/CLAUDE.md` | instructions communes | [CLAUDE.md managé](https://code.claude.com/docs/en/memory) : chargé dans chaque session, impossible à exclure |
+| `plugins/team-standards/` | skills chargées par chemin de fichier : `ui-design` (front), `tests` (fichiers de test) | plugin, depuis la marketplace `team-config` de ce dépôt (`.claude-plugin/marketplace.json`) |
 
-Claude Code écrit lui-même dans `~/.claude/settings.json` (`/config`, `/model`,
-plugins : code.claude.com/docs/en/settings, « A change you made in Claude Code is
-lost in new sessions »). Le fichier est donc un *modify template* chezmoi
-(chezmoi.io/user-guide/manage-different-types-of-file) : à chaque `apply`, les
-clés du dépôt remplacent celles de la machine, les autres restent telles que
-Claude Code les a écrites, et `enabledPlugins` se fusionne plugin par plugin.
-Une clé retirée du dépôt n'est pas retirée des machines.
+Les managed settings sont au-dessus de tout autre niveau : un développeur ne
+peut ni les retirer ni les contredire. Les listes (`permissions.allow`, `ask`,
+`deny`, `autoMode.*`) se combinent avec les siennes au lieu de les remplacer
+([settings](https://code.claude.com/docs/en/settings), « combines the lists
+instead of picking one »).
 
-`claude.settings` vaut partout ; `claude.hosts.<host>` le complète pour un rôle
-de machine (`workstation`, `server`), surtout son `autoMode.environment`, que le
-classifieur ne lit que dans les réglages utilisateur
-(code.claude.com/docs/en/auto-mode-config, « Where the classifier reads
-configuration »). Chaque machine déclare son rôle dans son `chezmoi.toml` ; sans
-lui, `chezmoi apply` échoue au lieu d'écrire des réglages incomplets.
+## Installer
 
-`autoMode.environment` est la liste complète, un emplacement par entrée, comme
-l'écrit `/auto-mode-setup` (code.claude.com/docs/en/auto-mode-config, « Review
-and save the draft ») : avec `"$defaults"`, l'entrée par défaut d'un emplacement
-reste à côté de la nôtre et la contredit (`claude auto-mode critique`). Les
-emplacements non personnalisés recopient `claude auto-mode defaults` : les
-revoir quand Claude Code change ses valeurs par défaut. Les entrées décrivent
-par rôle, pas par liste de dépôts ; les interdictions sont des règles
-`soft_deny` (avec `"$defaults"`), pas du texte d'environnement. Ce qui ne vaut
-que pour un dépôt va dans son `CLAUDE.md`, que le classifieur lit aussi.
+**Avant tout déploiement**, ce dépôt doit être clonable par chaque poste :
+la marketplace `team-config` est clonée par git sur la machine de chacun, avec
+ses identifiants, sans invite ([plugins/org](https://code.claude.com/docs/en/plugins/org),
+« each user needs read access to it »). Le placer dans l'organisation de
+l'entreprise (ou le rendre public), puis mettre son adresse dans
+`extraKnownMarketplaces.team-config.source` (voir [Adapter à l'entreprise](#adapter-à-lentreprise)).
 
-Hors dépôt, par machine : `~/.claude.json` (serveurs MCP, état d'exécution),
-`~/.claude/.credentials.json`, et les skills installés par leur outil officiel
-(`npx ctx7 setup --claude` pour Context7).
+Une seule voie par organisation : quand les managed settings du serveur
+livrent une clé, Claude Code ignore par défaut le fichier local
+([managed-settings](https://code.claude.com/docs/en/managed-settings),
+`managedSourcesBehavior`).
 
-## Installer une machine
+### Organisation Claude Team ou Enterprise
 
-Prérequis : Node et npm pour la statusline.
+Un Owner colle le résultat de cette commande dans
+[Admin Settings > Claude Code > Managed settings](https://claude.ai/admin-settings/claude-code) :
 
 ```bash
-# chezmoi, depuis sa release officielle (sommes de contrôle vérifiées) ou : snap install chezmoi --classic
-git clone https://github.com/VictorNain26/claude-code-config.git ~/projets/claude-code-config
-mkdir -p ~/.config/chezmoi
-printf 'sourceDir = "%s"\n[data]\nhost = "workstation"\n' ~/projets/claude-code-config > ~/.config/chezmoi/chezmoi.toml   # ou "server"
-chezmoi diff          # ce qui changerait
-chezmoi apply
-npm install -g ccstatusline@2.2.30
+jq --rawfile md policy/CLAUDE.md 'del(."$schema") + {claudeMd: $md}' policy/managed-settings.json
 ```
 
-Une machine d'un nouveau rôle demande d'abord son entrée dans `claude.hosts`.
-Après l'`apply`, `claude auto-mode config` montre les règles effectives et
-`claude auto-mode critique` relit les entrées ajoutées.
+Rien à installer sur les postes. `claude doctor` affiche la ligne
+`Managed settings (remote)` ([server-managed-settings](https://code.claude.com/docs/en/server-managed-settings)).
 
-## Au quotidien
+### Tout autre compte (Pro, Max, clé API) ou poste géré à la main
 
-- Modifier le dépôt, puis `chezmoi apply`.
-- Un réglage changé depuis Claude Code (`/effort`, `/config`, un plugin) s'écrit
-  dans `~/.claude/settings.json`. Sur une clé que le dépôt ne fixe pas, il reste ;
-  sur une clé qu'il fixe, le prochain `apply` le remplace : le reporter dans
-  `home/.chezmoidata/claude.json` pour le garder. `chezmoi diff` montre l'écart.
-- `chezmoi re-add ~/.claude/CLAUDE.md` rapatrie une modification faite en place
-  (par `/memory` par exemple).
+Depuis un clone du dépôt, avec les droits administrateur :
 
-## Choix, et ce qui n'y est pas
+```bash
+# Linux et WSL
+sudo install -Dm644 policy/managed-settings.json /etc/claude-code/managed-settings.d/50-team.json
+sudo install -Dm644 policy/CLAUDE.md /etc/claude-code/CLAUDE.md
+```
 
-- **Pas de hook.** Les fichiers de secrets sont cachés par les règles
-  `permissions.deny` natives, qui couvrent Read et `cat`/`head`/`tail`/`sed`/`tee`
-  dans Bash (code.claude.com/docs/en/permissions). Un hook de masquage gitleaks
-  a été mesuré à ~0,55 s par appel d'outil en session réelle : écarté. Le
-  sandbox natif et `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB` échouent sous WSL2
-  (`bwrap: Can't mkdir /mnt/c/Program Files/ClaudeCode`, Claude Code 2.1.283).
-- **Statusline** : [ccstatusline](https://github.com/sirmalloc/ccstatusline),
-  installé globalement et épinglé : ~0,25 s par rafraîchissement contre ~1,5 s
-  via `npx`.
-- **Sous-agents** : l'agent intégré `general-purpose`, forcé sur le modèle de la
-  session par `CLAUDE_CODE_SUBAGENT_MODEL_FORCE`.
+```bash
+# macOS
+D="/Library/Application Support/ClaudeCode"
+sudo install -d "$D/managed-settings.d"
+sudo install -m644 policy/managed-settings.json "$D/managed-settings.d/50-team.json"
+sudo install -m644 policy/CLAUDE.md "$D/CLAUDE.md"
+```
+
+```powershell
+# Windows, PowerShell en administrateur
+$D = "C:\Program Files\ClaudeCode"
+New-Item -ItemType Directory -Force "$D\managed-settings.d" | Out-Null
+Copy-Item policy\managed-settings.json "$D\managed-settings.d\50-team.json"
+Copy-Item policy\CLAUDE.md "$D\CLAUDE.md"
+```
+
+Le fichier va dans `managed-settings.d/` pour cohabiter avec une politique
+d'entreprise. Claude Code fusionne `managed-settings.json` puis les fichiers de
+`managed-settings.d/` par ordre alphabétique ; pour une valeur simple, le
+dernier l'emporte, donc `50-team.json` passe devant `managed-settings.json`. Si
+la politique d'entreprise doit gagner, elle va dans un fichier au préfixe plus
+haut (`90-company.json`). Un profil MDM ou une clé de registre HKLM, s'il
+existe, masque ces fichiers sans avertissement
+([managed-settings](https://code.claude.com/docs/en/managed-settings)).
+Mise à jour : `git pull` puis les mêmes commandes.
+
+### Parc sous MDM
+
+Sur macOS, les clés de `policy/managed-settings.json` se convertissent en
+profil `com.anthropic.claudecode` (objets en dictionnaires, listes en tableaux
+plist) ; sur Windows, le JSON entier va en chaîne dans la valeur
+`HKLM\SOFTWARE\Policies\ClaudeCode\Settings`. `policy/CLAUDE.md` va au chemin
+système ci-dessus ([managed-settings](https://code.claude.com/docs/en/managed-settings), « Delivery mechanisms »).
+
+### Vérifier
+
+- `/status` : `Enterprise managed settings` figure dans `Setting sources`, avec
+  `(file + drop-ins)` pour une installation par fichier ; aucune ligne
+  `Skipped sources` ne doit nommer ce fichier.
+- `/plugin` : `team-standards@team-config` est installé et activé.
+- `claude auto-mode config` : les règles effectives.
+
+## Adapter à l'entreprise
+
+- **Forge.** La marketplace pointe vers ce dépôt sur GitHub
+  (`extraKnownMarketplaces.team-config.source`). Si le dépôt part sur GitLab ou
+  ailleurs : `{"source": "git", "url": "https://gitlab.example.com/groupe/claude-code-config.git"}`.
+  Les permissions couvrent `gh` (GitHub) et `glab` (GitLab) : lecture
+  autorisée, création et merge de PR/MR en `ask`.
+- **Mode auto.** Par défaut, le classifieur ne fait confiance qu'au dépôt de
+  travail et à ses remotes. Quand l'organisation est connue, ajouter dans
+  `policy/managed-settings.json` un bloc `autoMode.environment` qui commence
+  par `"$defaults"` puis nomme l'organisation, la forge, les domaines et
+  services internes ([auto-mode-config](https://code.claude.com/docs/en/auto-mode-config),
+  « Define trusted infrastructure »). Les machines et réseaux de chacun vont
+  dans son propre `~/.claude/settings.json`.
+
+## La couche de chacun
+
+Dans `~/.claude/settings.json` et `~/.claude/CLAUDE.md`, à la main ou avec son
+propre outil de dotfiles :
+
+- préférences : `language`, `theme`, `effortLevel`, `statusLine`, notifications ;
+- mode par défaut (`permissions.defaultMode`), autorisations de lecture web,
+  MCP perso ;
+- `autoMode` qui décrit ses machines, son réseau, ses dépôts perso.
+
+## Choix
+
+- **`ask` plutôt que `deny` pour l'irréversible.** Un `deny` managé ne se lève
+  à aucun niveau, même sur demande explicite, et pousse Claude vers des
+  contournements ; `policy/CLAUDE.md` demande de confirmer ces actions, `ask`
+  le fait ([permissions](https://code.claude.com/docs/en/permissions)).
+- **Secrets : `deny` en Read et Edit, pas de hook.** Ces règles couvrent les
+  lectures et écritures de Claude lui-même, y compris `cat`/`head`/`tail`/`sed`
+  dans Bash, pas un script ou un conteneur qui lit le fichier
+  ([permissions](https://code.claude.com/docs/en/permissions)) ; le
+  [sandbox](https://code.claude.com/docs/en/sandboxing) est la vraie barrière.
+  Un hook de masquage gitleaks coûtait ~0,55 s par appel d'outil.
+- **Règles par chemin en skills.** Un plugin ne charge ni CLAUDE.md ni
+  `rules/` ; une skill avec `paths` se charge sur les mêmes fichiers
+  ([skills](https://code.claude.com/docs/en/skills)).
