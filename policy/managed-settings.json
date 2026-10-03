@@ -1,5 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "requiredMinimumVersion": "2.1.283",
   "attribution": {
     "commit": "Co-Authored-By: Claude <noreply@anthropic.com>",
     "pr": "Generated with Claude Code"
@@ -8,12 +9,9 @@
   "permissions": {
     "allow": [
       "Bash(pnpm install*)",
-      "Bash(pnpm add *)",
-      "Bash(pnpm remove *)",
       "Bash(pnpm update*)",
       "Bash(pnpm outdated*)",
       "Bash(pnpm why *)",
-      "Bash(pnpm run *)",
       "Bash(pnpm test*)",
       "Bash(pnpm lint*)",
       "Bash(pnpm build*)",
@@ -26,24 +24,17 @@
       "Bash(pnpm exec vitest *)",
       "Bash(npx prettier *)",
       "Bash(npx vitest *)",
-      "Bash(npx astro *)",
       "Bash(npx tsc *)",
       "Bash(npx eslint *)",
       "Bash(bun install*)",
-      "Bash(bun run *)",
       "Bash(bun test*)",
-      "Bash(bun add *)",
-      "Bash(bun remove *)",
       "Bash(bun outdated*)",
       "Bash(uv run pytest*)",
       "Bash(uv run ruff *)",
       "Bash(uv run mypy*)",
-      "Bash(uv run python -m *)",
       "Bash(uv sync*)",
       "Bash(uv lock*)",
-      "Bash(uv add *)",
       "Bash(uv tree*)",
-      "Bash(ffmpeg:*)",
       "Bash(python3 -m json.tool)",
       "Bash(git status*)",
       "Bash(git log*)",
@@ -92,6 +83,11 @@
       "Bash(docker inspect:*)"
     ],
     "ask": [
+      "Bash(pnpm add *)",
+      "Bash(pnpm remove *)",
+      "Bash(bun add *)",
+      "Bash(bun remove *)",
+      "Bash(uv add *)",
       "Bash(pnpm dlx *)",
       "Bash(bun x *)",
       "Bash(bunx *)",
@@ -131,59 +127,73 @@
       "Bash(rm -fr *)",
       "Bash(rm -rf *)",
       "Bash(sudo rm *)",
-      "Bash(yarn publish*)"
+      "Bash(yarn publish*)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(!.env.example)",
+      "Edit(.envrc)",
+      "Edit(~/.bashrc)",
+      "Edit(~/.zshrc)",
+      "Edit(~/.profile)"
     ],
     "deny": [
       "Bash(chmod -R 777*)",
       "Bash(chmod 777 /*)",
       "Bash(dd if=*)",
       "Bash(mkfs*)",
-      "Read(**/*.key)",
-      "Read(**/*.p12)",
-      "Read(**/*.pem)",
-      "Read(**/.env)",
-      "Read(**/.env.local)",
-      "Read(**/.env.development)",
-      "Read(**/.env.production)",
-      "Read(**/.env.staging)",
-      "Read(**/.env.test)",
-      "Read(**/.env.*.local)",
-      "Read(**/credentials.json)",
-      "Read(~/.aws/**)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(!.env.example)",
+      "Read(.envrc)",
+      "Read(*.pem)",
+      "Read(*.key)",
+      "Read(*.p12)",
+      "Read(credentials.json)",
+      "Read(secrets.json)",
+      "Read(secrets.yaml)",
+      "Read(secrets.yml)",
+      "Read(secrets.toml)",
       "Read(~/.ssh/**)",
-      "Read(**/secrets.json)",
-      "Read(**/secrets.yaml)",
-      "Read(**/secrets.yml)",
-      "Read(**/secrets.toml)",
-      "Edit(**/*.key)",
-      "Edit(**/*.p12)",
-      "Edit(**/*.pem)",
-      "Edit(**/.env)",
-      "Edit(**/.env.local)",
-      "Edit(**/.env.development)",
-      "Edit(**/.env.production)",
-      "Edit(**/.env.staging)",
-      "Edit(**/.env.test)",
-      "Edit(**/.env.*.local)",
-      "Edit(**/credentials.json)",
-      "Edit(~/.aws/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.azure/**)",
+      "Read(~/.kube/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.config/gcloud/**)",
+      "Read(~/.docker/config.json)",
+      "Read(~/.git-credentials)",
+      "Read(~/.netrc)",
+      "Read(~/.npmrc)",
+      "Read(~/.pypirc)",
       "Edit(~/.ssh/**)",
-      "Edit(**/secrets.json)",
-      "Edit(**/secrets.yaml)",
-      "Edit(**/secrets.yml)",
-      "Edit(**/secrets.toml)"
-    ]
+      "Edit(~/.aws/**)",
+      "Edit(~/.gnupg/**)",
+      "Edit(~/.azure/**)",
+      "Edit(~/.kube/**)",
+      "Edit(~/.config/gh/**)",
+      "Edit(~/.config/gcloud/**)",
+      "Edit(~/.docker/config.json)",
+      "Edit(~/.git-credentials)",
+      "Edit(~/.netrc)",
+      "Edit(~/.npmrc)",
+      "Edit(~/.pypirc)"
+    ],
+    "disableBypassPermissionsMode": "disable"
   },
   "extraKnownMarketplaces": {
-    "team-config": {
+    "claude-code-config": {
       "source": {
         "source": "github",
-        "repo": "VictorNain26/claude-code-config"
+        "repo": "VictorNain26/claude-code-config",
+        "sparsePaths": [
+          ".claude-plugin",
+          "plugins"
+        ]
       },
       "autoUpdate": true
     }
   },
   "enabledPlugins": {
-    "team-standards@team-config": true
+    "engineering-standards@claude-code-config": true
   }
 }
