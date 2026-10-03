@@ -1,3 +1,0 @@
-# Machine-local state never belongs here: this repo is cloned on every host.
-.credentials.json
-.claude.json

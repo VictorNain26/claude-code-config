@@ -1,4 +1,6 @@
 ---
+name: ui-design
+user-invocable: false
 description: Défauts designer lead — chargés uniquement sur du front (composants, styles, UI)
 paths:
   - "**/*.{tsx,jsx}"

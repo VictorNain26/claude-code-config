@@ -1,4 +1,3 @@
-# Config files render on Linux hosts: keep LF whatever platform the checkout happens on.
+# Policy files are copied as-is to every OS: keep LF whatever platform the checkout happens on.
 *.json text eol=lf
 *.md   text eol=lf
-*.tmpl text eol=lf
