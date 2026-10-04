@@ -271,18 +271,14 @@ it on or off at any time with `/sandbox`.
   prompts, and experienced users approve twice as often as new ones (Anthropic,
   [auto mode](https://www.anthropic.com/engineering/claude-code-auto-mode),
   [How we contain Claude](https://www.anthropic.com/engineering/how-we-contain-claude)):
-  a prompt on every push trains people to click through. `ask` is kept for
-  rare, irreversible or public actions; the auto-mode classifier handles the
-  rest, and the sandbox too where you turn it on.
-- **Sandbox recommended, not imposed.** It enforces file and network limits
-  at the OS level, including for scripts and `grep -r`, which permission rules
-  can't cover; Anthropic measured 84% fewer prompts with it
+  a prompt on every push trains people to click through.
+- **Sandbox recommended, not imposed.** Anthropic measured 84% fewer prompts
+  with it
   ([Claude Code sandboxing](https://www.anthropic.com/engineering/claude-code-sandboxing)),
   and prompt injection runs attacker commands in up to 84% of attempts on
   coding agents ([Liu et al., 2025](https://arxiv.org/abs/2509.22040)). But at
   the managed level nobody could turn it off, and it blocks Docker, `gh` and
-  local servers until tuned: it belongs in each user's settings, behind
-  `/sandbox`.
+  local servers until tuned.
 - **`ask` rather than `deny`.** The drop-in sits at the managed level, and "if
   a tool is denied at any level, no other level can allow it"
   ([permissions](https://code.claude.com/docs/en/permissions)): a `deny` would
@@ -301,9 +297,8 @@ it on or off at any time with `/sandbox`.
   asking ([npm exec](https://docs.npmjs.com/cli/commands/npm-exec)), while
   `pnpm exec` only adds `node_modules/.bin` to the `PATH`
   ([pnpm exec](https://pnpm.io/cli/exec)).
-- **Secrets are guarded by rules, not hooks.** `Read` deny rules cover
-  Claude's own reads, including `cat`, `head`, `tail` and `sed` in Bash, not a
-  script, a container or `grep -r` run from a parent directory — the sandbox
+- **Secrets are guarded by rules, not hooks.** `Read` deny rules don't reach
+  a script, a container or `grep -r` run from a parent directory; the sandbox
   covers those when you turn it on, because Claude Code merges `Read` deny
   rules into it
   ([sandboxing](https://code.claude.com/docs/en/sandboxing)). A
