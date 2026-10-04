@@ -317,8 +317,9 @@ it on or off at any time with `/sandbox`.
   Claude Code runs, the rules that helped were constraints ("do not…") while
   positive directives such as "follow code style" hurt ([Guardrails Beat Guidance, 2026](https://arxiv.org/abs/2604.11088)).
   Whether a rule file helps at all is still debated
-  ([Gloaguen et al., 2026](https://arxiv.org/abs/2602.11988)); the plugin's
-  evals are where this repository measures it.
+  ([Gloaguen et al., 2026](https://arxiv.org/abs/2602.11988)), and this
+  repository doesn't measure its own: the evals load the plugin's skills, not
+  this file.
 - **Skills instead of rules.** A plugin can't ship CLAUDE.md or `rules/`
   ([plugins-reference](https://code.claude.com/docs/en/plugins-reference#standard-layout));
   a skill with `paths` loads on the same files
