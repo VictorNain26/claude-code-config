@@ -133,10 +133,8 @@ appending to the lists already there, and do step 2. Repeat the copy when
 
 A drop-in linked to a user-writable clone is a convenience, not enforcement.
 To enforce the configuration across a fleet, [fork](#make-it-yours) the
-repository first — otherwise every machine follows this one's plugin updates —
-or pin the marketplace `source` to a tag with `ref`
-([marketplace-reference](https://code.claude.com/docs/en/plugins/marketplace-reference#marketplace-sources)).
-Then:
+repository first — otherwise every machine follows this one's plugin
+updates. Then:
 
 - **Claude Team or Enterprise**: an Owner pastes the output of this command into
   [Admin Settings > Claude Code > Managed settings](https://claude.ai/admin-settings/claude-code):
@@ -273,18 +271,14 @@ it on or off at any time with `/sandbox`.
   prompts, and experienced users approve twice as often as new ones (Anthropic,
   [auto mode](https://www.anthropic.com/engineering/claude-code-auto-mode),
   [How we contain Claude](https://www.anthropic.com/engineering/how-we-contain-claude)):
-  a prompt on every push trains people to click through. `ask` is kept for
-  rare, irreversible or public actions; the auto-mode classifier handles the
-  rest, and the sandbox too where you turn it on.
-- **Sandbox recommended, not imposed.** It enforces file and network limits
-  at the OS level, including for scripts and `grep -r`, which permission rules
-  can't cover; Anthropic measured 84% fewer prompts with it
+  a prompt on every push trains people to click through.
+- **Sandbox recommended, not imposed.** Anthropic measured 84% fewer prompts
+  with it
   ([Claude Code sandboxing](https://www.anthropic.com/engineering/claude-code-sandboxing)),
   and prompt injection runs attacker commands in up to 84% of attempts on
   coding agents ([Liu et al., 2025](https://arxiv.org/abs/2509.22040)). But at
   the managed level nobody could turn it off, and it blocks Docker, `gh` and
-  local servers until tuned: it belongs in each user's settings, behind
-  `/sandbox`.
+  local servers until tuned.
 - **`ask` rather than `deny`.** The drop-in sits at the managed level, and "if
   a tool is denied at any level, no other level can allow it"
   ([permissions](https://code.claude.com/docs/en/permissions)): a `deny` would
@@ -298,10 +292,13 @@ it on or off at any time with `/sandbox`.
   `pnpm install*` would allow `pnpm install <package>`. Those commands are
   allowed only without arguments.
 - **Dependency changes ask.** `config/CLAUDE.md` requires vetting every new
-  dependency; the prompt is where that happens.
-- **Secrets are guarded by rules, not hooks.** `Read` deny rules cover
-  Claude's own reads, including `cat`, `head`, `tail` and `sed` in Bash, not a
-  script, a container or `grep -r` run from a parent directory — the sandbox
+  dependency; the prompt is where that happens. `npx` has no allow rule for
+  the same reason: without a terminal it installs a missing package without
+  asking ([npm exec](https://docs.npmjs.com/cli/commands/npm-exec)), while
+  `pnpm exec` only adds `node_modules/.bin` to the `PATH`
+  ([pnpm exec](https://pnpm.io/cli/exec)).
+- **Secrets are guarded by rules, not hooks.** `Read` deny rules don't reach
+  a script, a container or `grep -r` run from a parent directory; the sandbox
   covers those when you turn it on, because Claude Code merges `Read` deny
   rules into it
   ([sandboxing](https://code.claude.com/docs/en/sandboxing)). A
@@ -315,8 +312,9 @@ it on or off at any time with `/sandbox`.
   Claude Code runs, the rules that helped were constraints ("do not…") while
   positive directives such as "follow code style" hurt ([Guardrails Beat Guidance, 2026](https://arxiv.org/abs/2604.11088)).
   Whether a rule file helps at all is still debated
-  ([Gloaguen et al., 2026](https://arxiv.org/abs/2602.11988)); the plugin's
-  evals are where this repository measures it.
+  ([Gloaguen et al., 2026](https://arxiv.org/abs/2602.11988)), and this
+  repository doesn't measure its own: the evals load the plugin's skills, not
+  this file.
 - **Skills instead of rules.** A plugin can't ship CLAUDE.md or `rules/`
   ([plugins-reference](https://code.claude.com/docs/en/plugins-reference#standard-layout));
   a skill with `paths` loads on the same files
@@ -346,9 +344,8 @@ the plugin changes and every week. Each case fails when its skill stops
 loading, so a model or Claude Code change that breaks a skill shows up
 ([plugin-evals](https://code.claude.com/docs/en/plugin-evals)).
 A change to a skill bumps `version` in
-`plugins/engineering-standards/.claude-plugin/plugin.json` — installed copies
-stay on the old version until it changes — then
-`claude plugin tag plugins/engineering-standards --push` tags the release.
+`plugins/engineering-standards/.claude-plugin/plugin.json`: installed copies
+stay on the old version until it changes.
 
 ## License
 

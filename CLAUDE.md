@@ -18,7 +18,7 @@ user's CLAUDE.md, and the plugins of `.claude-plugin/marketplace.json`.
 - After a change: `jq empty` on every JSON file, `claude plugin validate . --strict`
   and `claude plugin validate ./plugins/engineering-standards --strict`.
 - A skill change bumps `version` in the plugin's `plugin.json`, otherwise
-  installed copies stay on the old one; tag with `claude plugin tag`.
+  installed copies stay on the old one.
 - CI also runs weekly against the latest Claude Code. GitHub disables
   scheduled workflows in a public repository after 60 days without activity:
   re-enable it in the Actions tab if it stops.
