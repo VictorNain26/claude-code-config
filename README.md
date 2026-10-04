@@ -123,6 +123,20 @@ Upstash. To add it:
 claude plugin install context7@claude-plugins-official
 ```
 
+**Optional — a browser.** The `ui-design` skill asks Claude to look at a UI
+change rendered before calling it done, and to say so when it can't.
+[Playwright MCP](https://github.com/microsoft/playwright-mcp) gives it a
+browser and screenshots; the plugin runs `npx @playwright/mcp@latest` on your
+machine. To add it:
+
+```bash
+claude plugin install playwright@claude-plugins-official
+```
+
+On a Pro, Max, Team or Enterprise plan, outside WSL,
+[Claude in Chrome](https://code.claude.com/docs/en/chrome) drives your own
+browser instead: `claude --chrome`.
+
 ### Without admin rights
 
 Copy the keys of `config/settings.json` into `~/.claude/settings.json`,
@@ -320,7 +334,8 @@ it on or off at any time with `/sandbox`.
   a skill with `paths` loads on the same files
   ([skills](https://code.claude.com/docs/en/skills)).
 - **No hooks, agents or MCP servers forced on you.** Each one runs code, costs
-  latency or widens what leaves the machine; Context7 stays an opt-in step.
+  latency or widens what leaves the machine; Context7 and the browser stay
+  opt-in steps.
 
 ## Troubleshooting
 
