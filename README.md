@@ -298,7 +298,11 @@ it on or off at any time with `/sandbox`.
   `pnpm install*` would allow `pnpm install <package>`. Those commands are
   allowed only without arguments.
 - **Dependency changes ask.** `config/CLAUDE.md` requires vetting every new
-  dependency; the prompt is where that happens.
+  dependency; the prompt is where that happens. `npx` has no allow rule for
+  the same reason: without a terminal it installs a missing package without
+  asking ([npm exec](https://docs.npmjs.com/cli/commands/npm-exec)), while
+  `pnpm exec` only adds `node_modules/.bin` to the `PATH`
+  ([pnpm exec](https://pnpm.io/cli/exec)).
 - **Secrets are guarded by rules, not hooks.** `Read` deny rules cover
   Claude's own reads, including `cat`, `head`, `tail` and `sed` in Bash, not a
   script, a container or `grep -r` run from a parent directory — the sandbox
