@@ -54,6 +54,10 @@ the exit codes. What did not run is reported as not run.
   is a bug. Nothing "for later".
 - Never `--no-verify` or a skipped hook unless asked: a failing hook is a
   cause to fix. Stage files one by one.
+- Several PRs for one piece of work go in a cascade: each branch starts from
+  the previous one and each PR targets it, never all from the default branch.
+  Merge bottom-up, retargeting the next PR onto the default branch after each
+  merge.
 - Confirm before a force push, `reset --hard`, `rm -rf`, dropping a database,
   deleting a remote branch, merging or closing a pull request.
 
