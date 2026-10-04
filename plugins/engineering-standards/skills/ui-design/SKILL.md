@@ -37,3 +37,10 @@ paths:
 - Inline validation on blur; never clear a field in error.
 - Dark mode through `color-scheme` and tokens, persisted user choice.
 - Error copy names the problem and the fix; modals only for the irreversible.
+
+## Before calling it done
+
+- Look at the change rendered, in a browser or a screenshot, at a mobile
+  width and in every theme the project supports.
+- Without a way to see it, say the rendering is unchecked; never describe how
+  a UI looks from its code alone.
