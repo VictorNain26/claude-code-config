@@ -133,10 +133,8 @@ appending to the lists already there, and do step 2. Repeat the copy when
 
 A drop-in linked to a user-writable clone is a convenience, not enforcement.
 To enforce the configuration across a fleet, [fork](#make-it-yours) the
-repository first — otherwise every machine follows this one's plugin updates —
-or pin the marketplace `source` to a tag with `ref`
-([marketplace-reference](https://code.claude.com/docs/en/plugins/marketplace-reference#marketplace-sources)).
-Then:
+repository first — otherwise every machine follows this one's plugin
+updates. Then:
 
 - **Claude Team or Enterprise**: an Owner pastes the output of this command into
   [Admin Settings > Claude Code > Managed settings](https://claude.ai/admin-settings/claude-code):
@@ -350,9 +348,8 @@ the plugin changes and every week. Each case fails when its skill stops
 loading, so a model or Claude Code change that breaks a skill shows up
 ([plugin-evals](https://code.claude.com/docs/en/plugin-evals)).
 A change to a skill bumps `version` in
-`plugins/engineering-standards/.claude-plugin/plugin.json` — installed copies
-stay on the old version until it changes — then
-`claude plugin tag plugins/engineering-standards --push` tags the release.
+`plugins/engineering-standards/.claude-plugin/plugin.json`: installed copies
+stay on the old version until it changes.
 
 ## License
 
