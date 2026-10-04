@@ -50,7 +50,7 @@ jobs:
           claude -p --model "$MODEL" --output-format stream-json --verbose "Reply ok" \
             | jq -r 'select(.subtype == "init") | "Resolved model: \(.model)"'
           claude plugin eval plugins/engineering-standards \
-            --trust-plugin --scaffold --ablation none \
+            --trust-plugin --scaffold --ablation none --keep-temp \
             --model "$MODEL" --judge-model haiku --threshold 0.66 --max-cost-usd 5 \
             --no-publish --json "results-$MODEL.json" \
             --allow-tools Edit Write WebFetch
@@ -62,4 +62,12 @@ jobs:
           path: |
             results-*.json
             plugins/engineering-standards/evals/results/
+          if-no-files-found: ignore
+
+      - name: Upload eval transcripts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: eval-traces-${{ matrix.model }}
+          path: /tmp/claude-eval-*/out/trace.jsonl
           if-no-files-found: ignore
