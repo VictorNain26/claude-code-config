@@ -1,7 +1,7 @@
 ---
 name: ui-design
 user-invocable: false
-description: UI rules for components, styles, forms and layouts: WCAG 2.2 accessibility, design tokens, interaction states, responsive layout, motion, dark mode, layout shift, form validation, error copy. Use when writing or reviewing UI code.
+description: UI rules for components, styles, forms and layouts: WCAG 2.2 accessibility, design tokens, interaction states, responsive layout, motion, dark mode, layout shift, form validation, error copy, visual check. Use when writing, changing or reviewing UI code: a component, a style, a form or a layout.
 paths:
   - "**/*.{tsx,jsx,vue,svelte}"
   - "**/*.{css,scss}"

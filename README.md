@@ -181,9 +181,11 @@ machine.
 claude plugin install playwright@claude-plugins-official
 ```
 
-On a Pro, Max, Team or Enterprise plan, outside WSL,
+On a Pro, Max, Team or Enterprise plan signed in with `/login`,
 [Claude in Chrome](https://code.claude.com/docs/en/chrome) drives your own
-browser instead: `claude --chrome`.
+browser instead: `claude --chrome`. Its documentation lists WSL as
+unsupported, yet with 2.1.289 Claude Code in WSL2 drove Chrome on Windows,
+which loaded a dev server running in WSL on `localhost`.
 
 ### Sandbox
 
