@@ -173,19 +173,18 @@ claude plugin install context7@claude-plugins-official
 
 The `ui-design` skill asks Claude to look at a UI change rendered before
 calling it done, and to say so when it can't.
-[Playwright MCP](https://github.com/microsoft/playwright-mcp) gives it a
-browser and screenshots; the plugin runs `npx @playwright/mcp@latest` on your
-machine.
-
-```bash
-claude plugin install playwright@claude-plugins-official
-```
-
-On a Pro, Max, Team or Enterprise plan signed in with `/login`,
 [Claude in Chrome](https://code.claude.com/docs/en/chrome) drives your own
-browser instead: `claude --chrome`. Its documentation lists WSL as
-unsupported, yet with 2.1.289 Claude Code in WSL2 drove Chrome on Windows,
-which loaded a dev server running in WSL on `localhost`.
+browser: `claude --chrome`, or `/chrome` and **Enabled by default**. It needs a
+Pro, Max, Team or Enterprise plan signed in with `/login`. It opens its own
+tabs but shares your browser's login state, so what it sees is what you see.
+Its documentation lists WSL as unsupported, yet with 2.1.289 Claude Code in
+WSL2 drove Chrome on Windows, which loaded a dev server running in WSL on
+`localhost`.
+
+Your profile is also its limit: a check that needs a clean browser (no service
+worker, cache or cookie left from earlier visits) or a scenario replayed
+identically fits a short throwaway script driving headless Chromium better.
+No browser plugin is needed for that.
 
 ### Sandbox
 
