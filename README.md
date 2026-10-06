@@ -30,15 +30,15 @@ for your team.
   remote branch deletion, local branch and tag deletion, `--no-verify`;
   staging everything at once (`git add -A`, `git add .`, `git commit -a`);
   adding, removing or upgrading a dependency; `dlx`/`bunx`; `docker exec`;
-  publishing and releases; merging or closing a PR/MR; reading or editing a
-  project `.npmrc`; editing shell startup files.
+  `dd` and `sudo rm`; publishing and releases; merging or closing a PR/MR;
+  reading or editing a project `.npmrc`; editing shell startup files.
 - **Denied**: secret files. In the project, `.env` and `.env.*` (templates
   such as `.env.example`, `.sample`, `.template`, `.dist` stay readable),
   `.envrc`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, `secrets.*`; in your
   home directory, `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.azure`, `~/.kube`, the `gh`
   and `gcloud` configs, `~/.docker/config.json`, `~/.git-credentials`,
   `~/.netrc`, `~/.npmrc`, `~/.pypirc`, `~/.claude/.credentials.json`. Claude
-  can't read, create or edit them; you do. Also `mkfs`, `dd`, `chmod 777`.
+  can't read, create or edit them; you do. Also `mkfs` and `chmod 777`.
 
 Everything else, such as pushing, opening a PR, `reset --hard` or `rm -r`, is
 left to your permission mode. In auto mode, the default in a terminal since
@@ -343,7 +343,7 @@ as administrator. Then delete the `@…/config/AGENTS.md` line from
   Secret files are the exception: only a `deny` also covers `cat`, `head` and
   the like in Bash (an `ask` rule on `.env` let `cat .env` through in a test
   on 2.1.288), and a `Read` deny also blocks editing and creating the file
-  (same page).
+  (same page). So are `mkfs` and `chmod 777`, which no coding task needs.
 - **A rule that must always hold is also a permission.** CLAUDE.md is context,
   not enforced configuration
   ([memory](https://code.claude.com/docs/en/memory)), while an ask rule
