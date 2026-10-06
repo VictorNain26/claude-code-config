@@ -14,7 +14,7 @@ for your team.
 | Path | Contents | How Claude Code loads it |
 |---|---|---|
 | `config/settings.json` | permissions, bypass mode disabled, the plugin below | a settings file linked into the managed-settings drop-in directory ([managed-settings](https://code.claude.com/docs/en/managed-settings)) |
-| `config/CLAUDE.md` | working rules: reuse before writing, verify before claiming, code and git conventions | imported from your own `~/.claude/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)) |
+| `config/AGENTS.md` | working rules: reuse before writing, verify before claiming, code and git conventions | imported from your own `~/.claude/CLAUDE.md` through `config/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)); other agents read it as is ([other coding agents](#other-coding-agents)) |
 | `plugins/engineering-standards/` | skills `ui-design`, `tests`, `third-party-config`, each loaded when Claude works on matching files | plugin from this repository's marketplace |
 
 ### Permissions
@@ -99,7 +99,8 @@ Copy-Item config\settings.json "$D\50-claude-code-config.json"
 
 ### 2. Working rules
 
-Import `config/CLAUDE.md` from your own `~/.claude/CLAUDE.md`. Spaces in the
+Import `config/CLAUDE.md`, which loads `config/AGENTS.md`, from your own
+`~/.claude/CLAUDE.md`. Spaces in the
 path must be escaped with a backslash, or the import is ignored
 ([memory](https://code.claude.com/docs/en/memory#import-additional-files)).
 These commands add the line once, however often you run them.
@@ -143,14 +144,14 @@ Then:
   [Admin Settings > Claude Code > Managed settings](https://claude.ai/admin-settings/claude-code):
 
   ```bash
-  jq --rawfile md config/CLAUDE.md 'del(."$schema") + {claudeMd: $md}' config/settings.json
+  jq --rawfile md config/AGENTS.md 'del(."$schema") + {claudeMd: $md}' config/settings.json
   ```
 
   Machines that sign in another way (another organization's API key,
   Bedrock, Vertex, a custom base URL) don't fetch it: give them the file
   install too ([admin-setup](https://code.claude.com/docs/en/admin-setup)).
 - **File or MDM**: copy `config/settings.json` into `managed-settings.d/` and
-  `config/CLAUDE.md` to the managed CLAUDE.md path (`/etc/claude-code/CLAUDE.md`,
+  `config/AGENTS.md` to the managed CLAUDE.md path (`/etc/claude-code/CLAUDE.md`,
   `/Library/Application Support/ClaudeCode/CLAUDE.md`,
   `C:\Program Files\ClaudeCode\CLAUDE.md`), or deliver them through MDM
   ([managed-settings](https://code.claude.com/docs/en/managed-settings)).
@@ -162,7 +163,7 @@ out of the machine or blocks tools you may need. Turn on the ones you want.
 
 ### Context7
 
-`config/CLAUDE.md` tells Claude to look library documentation up in
+`config/AGENTS.md` tells Claude to look library documentation up in
 [Context7](https://github.com/upstash/context7) when it is installed. It is a
 hosted MCP server: the library names and questions go to Upstash.
 
@@ -227,6 +228,29 @@ need: Docker, servers running outside it (on Linux a sandboxed command's
 - When a command fails inside it, Claude Code offers to rerun it outside the
   sandbox, through your permission mode.
 
+### Other coding agents
+
+The working rules are plain [AGENTS.md](https://agents.md) with no
+Claude-specific syntax, so another agent can load the same file. Codex reads
+`AGENTS.md` from its home directory, `~/.codex` unless `CODEX_HOME` is set,
+in every project, and reads `AGENTS.override.md` there instead when it exists
+([Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)).
+Its documentation describes no `@` imports, so link the file itself from the
+clone. `ln` refuses to replace an `AGENTS.md` you already have: merge yours
+into your own copy first, or keep it.
+
+```bash
+mkdir -p "${CODEX_HOME:-$HOME/.codex}"
+ln -s "$PWD/config/AGENTS.md" "${CODEX_HOME:-$HOME/.codex}/AGENTS.md"
+```
+
+On Windows, copy it instead and copy again after each `git pull`. Not tested
+with Codex yet.
+
+The rest stays Claude Code only: `config/settings.json` and the plugin. The
+skills are [Agent Skills](https://agentskills.io) `SKILL.md` files, a format
+other agents read, but each agent looks for them in its own directory.
+
 ## Verify
 
 - `claude doctor` reports no `Invalid settings` for the linked file.
@@ -235,7 +259,7 @@ need: Docker, servers running outside it (on Linux a sandboxed command's
 - `/plugin` shows `engineering-standards@claude-code-config` installed and
   enabled.
 - Ask Claude what its working rules say about reusing existing tools: it
-  quotes the "Don't reinvent the wheel" section of `config/CLAUDE.md`.
+  quotes the "Don't reinvent the wheel" section of `config/AGENTS.md`.
 
 ## Update
 
@@ -246,7 +270,11 @@ git pull
 Settings and working rules follow the clone at the next session (copy again
 on Windows). The plugin updates in the background and the new version loads at
 the following launch
-([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). Changes
+([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). An
+[organization](#for-an-organization) install set up before October 7, 2026
+copied or pasted `config/CLAUDE.md`, which now only holds `@AGENTS.md`:
+switch that source to `config/AGENTS.md`, or the managed rules load nothing.
+Changes
 are listed in the
 [commit history](https://github.com/VictorNain26/claude-code-config/commits/master).
 
@@ -303,6 +331,14 @@ as administrator. Then delete the `@…/config/CLAUDE.md` line from
   only native way to include a settings file whole, so an update replaces it
   instead of merging into yours; a CLAUDE.md import does the same for
   instructions. Both follow `git pull`.
+- **Rules in AGENTS.md, imported by a one-line CLAUDE.md.** AGENTS.md is the
+  instruction file other coding agents read, so the rules don't tie you to
+  Claude Code. Claude Code reads a project's AGENTS.md on its own, but not at
+  the user level, and not in some sessions (before 2.1.277, with its built-in
+  AGENTS.md plugin disabled); an `@AGENTS.md` import works in all of them and
+  never loads the file twice
+  ([memory](https://code.claude.com/docs/en/memory#agents-md)). Existing
+  installs keep their `config/CLAUDE.md` import line unchanged.
 - **Few prompts, on purpose.** Claude Code users approve 93% of permission
   prompts, and experienced users auto-approve twice as often as new ones
   (Anthropic,
@@ -329,14 +365,14 @@ as administrator. Then delete the `@…/config/CLAUDE.md` line from
   ([memory](https://code.claude.com/docs/en/memory)), while an ask rule
   prompts for any subcommand that matches, in auto mode too
   ([permissions](https://code.claude.com/docs/en/permissions#compound-commands)).
-  So "stage files one by one" is both a line in `config/CLAUDE.md` and ask
+  So "stage files one by one" is both a line in `config/AGENTS.md` and ask
   rules on `git add -A`, `git add .` and `git commit -a`: the prompt only
   shows when Claude ignores the line.
 - **Exact forms for commands that take arguments.** A rule matches by prefix,
   so `git fetch*` would also allow `git fetch --upload-pack=<command>` and
   `pnpm install*` would allow `pnpm install <package>`. Those commands are
   allowed only without arguments.
-- **Dependency changes ask.** `config/CLAUDE.md` requires vetting every new
+- **Dependency changes ask.** `config/AGENTS.md` requires vetting every new
   dependency; the prompt is where that happens. `npx` has no allow rule for
   the same reason: without a terminal it installs a missing package without
   asking ([npm exec](https://docs.npmjs.com/cli/commands/npm-exec)), while
@@ -351,7 +387,7 @@ as administrator. Then delete the `@…/config/CLAUDE.md` line from
 - **Bypass mode is disabled** (`disableBypassPermissionsMode`, as in
   Anthropic's managed-settings examples): skipping every check would void the
   rest.
-- **A short, mostly negative rule file.** `config/CLAUDE.md` is about 60
+- **A short, mostly negative rule file.** `config/AGENTS.md` is about 60
   lines. Claude Opus 4 and Claude 3.7 Sonnet follow 99.6–100% of 50
   simultaneous instructions, Claude 3.5 Haiku 78%
   ([IFScale, 2025](https://arxiv.org/abs/2507.11538)), and in more than 5,000
