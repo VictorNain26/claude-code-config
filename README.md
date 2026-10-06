@@ -272,6 +272,10 @@ the following launch
 ([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). Changes
 are listed in the [commit history](https://github.com/VictorNain26/claude-code-config/commits/master).
 
+Installs made before October 8, 2026 import `config/CLAUDE.md`, which no
+longer exists: change that line in `~/.claude/CLAUDE.md` to
+`config/AGENTS.md` before pulling, or no working rules load.
+
 ## Uninstall
 
 Remove the settings link, the plugin and its marketplace:
