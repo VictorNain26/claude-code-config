@@ -2,8 +2,8 @@
 
 A public, opt-in Claude Code environment: `config/settings.json` linked into
 the managed-settings drop-in directory, the rules of `config/AGENTS.md`
-imported from the user's CLAUDE.md through `config/CLAUDE.md`, and the plugins
-of `.claude-plugin/marketplace.json`.
+imported from the user's CLAUDE.md, and the plugins of
+`.claude-plugin/marketplace.json`.
 `README.md` documents it for users.
 
 - Only what suits anyone who installs it goes here. A preference, a machine, a

@@ -14,13 +14,13 @@ for your team.
 | Path | Contents | How Claude Code loads it |
 |---|---|---|
 | `config/settings.json` | permissions, bypass mode disabled, the plugin below | a settings file linked into the managed-settings drop-in directory ([managed-settings](https://code.claude.com/docs/en/managed-settings)) |
-| `config/AGENTS.md` | working rules: reuse before writing, verify before claiming, code and git conventions | imported from your own `~/.claude/CLAUDE.md` through `config/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)); other agents read it as is ([other coding agents](#other-coding-agents)) |
+| `config/AGENTS.md` | working rules: reuse before writing, verify before claiming, code and git conventions | imported from your own `~/.claude/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)); other agents read it as is ([other coding agents](#other-coding-agents)) |
 | `plugins/engineering-standards/` | skills `ui-design`, `tests`, `third-party-config`, each loaded when Claude works on matching files | plugin from this repository's marketplace |
 
 ### Permissions
 
 - **Allowed without a prompt**: test, lint, build, format, typecheck and dev
-  scripts of pnpm and bun, pytest/ruff/mypy through uv; installing from the
+  scripts of pnpm, `bun test`, pytest/ruff/mypy through uv; installing from the
   lockfile (`pnpm install`, `bun install`, `uv sync`, all without a package
   argument); `git fetch`, `git pull`, commits, cherry-picks, new branches and
   worktrees; read-only `gh` and `glab`; Docker builds, logs and inspection.
@@ -99,8 +99,7 @@ Copy-Item config\settings.json "$D\50-claude-code-config.json"
 
 ### 2. Working rules
 
-Import `config/CLAUDE.md`, which loads `config/AGENTS.md`, from your own
-`~/.claude/CLAUDE.md`. Spaces in the
+Import `config/AGENTS.md` from your own `~/.claude/CLAUDE.md`. Spaces in the
 path must be escaped with a backslash, or the import is ignored
 ([memory](https://code.claude.com/docs/en/memory#import-additional-files)).
 These commands add the line once, however often you run them.
@@ -109,7 +108,7 @@ macOS, Linux and WSL:
 
 ```bash
 mkdir -p ~/.claude
-line="@$(pwd | sed 's/ /\\ /g')/config/CLAUDE.md"
+line="@$(pwd | sed 's/ /\\ /g')/config/AGENTS.md"
 grep -qxF "$line" ~/.claude/CLAUDE.md 2>/dev/null || printf '\n%s\n' "$line" >> ~/.claude/CLAUDE.md
 ```
 
@@ -117,7 +116,7 @@ Windows PowerShell:
 
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.claude" | Out-Null
-$line = "@" + ((Get-Location).Path -replace '\\','/' -replace ' ','\ ') + "/config/CLAUDE.md"
+$line = "@" + ((Get-Location).Path -replace '\\','/' -replace ' ','\ ') + "/config/AGENTS.md"
 $md = "$HOME\.claude\CLAUDE.md"
 if (-not ((Test-Path $md) -and (Get-Content $md) -contains $line)) { Add-Content -Encoding utf8 $md "`n$line" }
 ```
@@ -155,6 +154,16 @@ Then:
   `/Library/Application Support/ClaudeCode/CLAUDE.md`,
   `C:\Program Files\ClaudeCode\CLAUDE.md`), or deliver them through MDM
   ([managed-settings](https://code.claude.com/docs/en/managed-settings)).
+
+## Verify
+
+- `claude doctor` reports no `Invalid settings` for the linked file.
+- In a session, `/status` lists `Enterprise managed settings` under
+  `Setting sources` with `(drop-ins)`, and no `Skipped sources` line names it.
+- `/plugin` shows `engineering-standards@claude-code-config` installed and
+  enabled.
+- Ask Claude what its working rules say about reusing existing tools: it
+  quotes the "Don't reinvent the wheel" section of `config/AGENTS.md`.
 
 ## Optional add-ons
 
@@ -251,16 +260,6 @@ The rest stays Claude Code only: `config/settings.json` and the plugin. The
 skills are [Agent Skills](https://agentskills.io) `SKILL.md` files, a format
 other agents read, but each agent looks for them in its own directory.
 
-## Verify
-
-- `claude doctor` reports no `Invalid settings` for the linked file.
-- In a session, `/status` lists `Enterprise managed settings` under
-  `Setting sources` with `(drop-ins)`, and no `Skipped sources` line names it.
-- `/plugin` shows `engineering-standards@claude-code-config` installed and
-  enabled.
-- Ask Claude what its working rules say about reusing existing tools: it
-  quotes the "Don't reinvent the wheel" section of `config/AGENTS.md`.
-
 ## Update
 
 ```bash
@@ -270,24 +269,8 @@ git pull
 Settings and working rules follow the clone at the next session (copy again
 on Windows). The plugin updates in the background and the new version loads at
 the following launch
-([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). An
-[organization](#for-an-organization) install set up before October 7, 2026
-copied or pasted `config/CLAUDE.md`, which now only holds `@AGENTS.md`:
-switch that source to `config/AGENTS.md`, or the managed rules load nothing.
-Changes
-are listed in the
-[commit history](https://github.com/VictorNain26/claude-code-config/commits/master).
-
-### Upgrading from the `team-config` layout
-
-Installs made before October 2026 used `managed-settings.d/50-team.json`, a
-copied managed `CLAUDE.md` and the `team-config` marketplace. Remove them, then
-install as above:
-
-```bash
-sudo rm /etc/claude-code/managed-settings.d/50-team.json /etc/claude-code/CLAUDE.md
-claude plugin marketplace remove team-config
-```
+([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). Changes
+are listed in the [commit history](https://github.com/VictorNain26/claude-code-config/commits/master).
 
 ## Uninstall
 
@@ -300,7 +283,7 @@ claude plugin marketplace remove claude-code-config
 
 On macOS, remove `/Library/Application Support/ClaudeCode/managed-settings.d/50-claude-code-config.json`;
 on Windows, `Remove-Item "C:\Program Files\ClaudeCode\managed-settings.d\50-claude-code-config.json"`
-as administrator. Then delete the `@…/config/CLAUDE.md` line from
+as administrator. Then delete the `@…/config/AGENTS.md` line from
 `~/.claude/CLAUDE.md`, and uninstall the add-ons you installed, for example
 `claude plugin uninstall context7@claude-plugins-official`.
 
@@ -331,14 +314,11 @@ as administrator. Then delete the `@…/config/CLAUDE.md` line from
   only native way to include a settings file whole, so an update replaces it
   instead of merging into yours; a CLAUDE.md import does the same for
   instructions. Both follow `git pull`.
-- **Rules in AGENTS.md, imported by a one-line CLAUDE.md.** AGENTS.md is the
-  instruction file other coding agents read, so the rules don't tie you to
-  Claude Code. Claude Code reads a project's AGENTS.md on its own, but not at
-  the user level, and not in some sessions (before 2.1.277, with its built-in
-  AGENTS.md plugin disabled); an `@AGENTS.md` import works in all of them and
-  never loads the file twice
-  ([memory](https://code.claude.com/docs/en/memory#agents-md)). Existing
-  installs keep their `config/CLAUDE.md` import line unchanged.
+- **Rules in AGENTS.md.** AGENTS.md is the instruction file other coding
+  agents read, so the rules don't tie you to Claude Code. Claude Code reads a
+  project's AGENTS.md on its own, but not at the user level, hence the import
+  from `~/.claude/CLAUDE.md`
+  ([memory](https://code.claude.com/docs/en/memory#agents-md)).
 - **Few prompts, on purpose.** Claude Code users approve 93% of permission
   prompts, and experienced users auto-approve twice as often as new ones
   (Anthropic,
