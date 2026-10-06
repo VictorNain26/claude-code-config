@@ -233,13 +233,15 @@ need: Docker, servers running outside it (on Linux a sandboxed command's
 The working rules are plain [AGENTS.md](https://agents.md) with no
 Claude-specific syntax, so another agent can load the same file. Codex reads
 `AGENTS.md` from its home directory, `~/.codex` unless `CODEX_HOME` is set,
-in every project, and has no `@` imports
-([Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)):
-link the file there from the clone.
+in every project, and reads `AGENTS.override.md` there instead when it exists
+([Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)).
+Its documentation describes no `@` imports, so link the file itself from the
+clone. `ln` refuses to replace an `AGENTS.md` you already have: merge yours
+into your own copy first, or keep it.
 
 ```bash
-mkdir -p ~/.codex
-ln -s "$PWD/config/AGENTS.md" ~/.codex/AGENTS.md
+mkdir -p "${CODEX_HOME:-$HOME/.codex}"
+ln -s "$PWD/config/AGENTS.md" "${CODEX_HOME:-$HOME/.codex}/AGENTS.md"
 ```
 
 On Windows, copy it instead and copy again after each `git pull`. Not tested
@@ -268,7 +270,11 @@ git pull
 Settings and working rules follow the clone at the next session (copy again
 on Windows). The plugin updates in the background and the new version loads at
 the following launch
-([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). Changes
+([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). An
+[organization](#for-an-organization) install set up before October 7, 2026
+copied or pasted `config/CLAUDE.md`, which now only holds `@AGENTS.md`:
+switch that source to `config/AGENTS.md`, or the managed rules load nothing.
+Changes
 are listed in the
 [commit history](https://github.com/VictorNain26/claude-code-config/commits/master).
 
