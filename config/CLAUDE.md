@@ -4,9 +4,9 @@
 
 - Don't write code, a script, a hook or a tool before checking for a native
   feature of the platform or a maintained library or tool that covers the
-  need. When nothing robust does, custom code stays glue between existing
-  pieces. This holds for product code, scripts, CI, hooks and Claude Code
-  configuration.
+  need, nor instead of the one you found. When nothing robust covers it,
+  custom code stays glue between existing pieces. This holds for product
+  code, scripts, CI, hooks and Claude Code configuration.
 - Don't add a dependency without checking it the same day and citing what you
   checked: repository not archived, a release or a commit on the default branch
   within the last six months, issues that get answers, real adoption (stars,
@@ -38,7 +38,7 @@
   trigger the rule. Same for any obstacle: don't work around the symptom, fix
   the cause.
 - No defensive guard between two of your own functions: strict validation
-  belongs at the boundaries only, user input and external APIs.
+  belongs at the boundaries only, such as user input and external APIs.
 - Don't change anything outside the requested scope: it goes in a separate PR.
 
 ## Git
@@ -60,6 +60,6 @@
 
 ## Human-only actions
 
-Never pretend to fix 2FA, access that requires a human, changes to your own
-permissions or actions on a third-party account: say so and give the manual
-procedure.
+2FA, access that requires a human, changes to your own permissions, actions on
+a third-party account are not yours to do: say so and give the manual
+procedure, never a pretend fix.
