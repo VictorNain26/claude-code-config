@@ -99,6 +99,7 @@
       "Bash(git commit * --all)",
       "Bash(git commit * --all *)",
       "Bash(sudo rm *)",
+      "Bash(dd *)",
       "Bash(npm publish*)",
       "Bash(pnpm publish*)",
       "Bash(yarn publish*)",
@@ -117,7 +118,6 @@
     "deny": [
       "Bash(chmod -R 777*)",
       "Bash(chmod 777 /*)",
-      "Bash(dd if=*)",
       "Bash(mkfs*)",
       "Read(.env)",
       "Read(.env.*)",
