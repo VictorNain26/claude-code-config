@@ -28,6 +28,7 @@ for your team.
   a prompt ([permissions](https://code.claude.com/docs/en/permissions)).
 - **Ask first**, for rare, irreversible or public actions: force pushes and
   remote branch deletion, local branch and tag deletion, `--no-verify`;
+  staging everything at once (`git add -A`, `git add .`, `git commit -a`);
   adding, removing or upgrading a dependency; `dlx`/`bunx`; `docker exec`;
   publishing and releases; merging or closing a PR/MR; reading or editing a
   project `.npmrc`; editing shell startup files.
@@ -323,6 +324,14 @@ as administrator. Then delete the `@…/config/CLAUDE.md` line from
   the like in Bash (an `ask` rule on `.env` let `cat .env` through in a test
   on 2.1.288), and a `Read` deny also blocks editing and creating the file
   (same page).
+- **A rule that must always hold is also a permission.** CLAUDE.md is context,
+  not enforced configuration
+  ([memory](https://code.claude.com/docs/en/memory)), while an ask rule
+  prompts for any subcommand that matches, in auto mode too
+  ([permissions](https://code.claude.com/docs/en/permissions#compound-commands)).
+  So "stage files one by one" is both a line in `config/CLAUDE.md` and ask
+  rules on `git add -A`, `git add .` and `git commit -a`: the prompt only
+  shows when Claude ignores the line.
 - **Exact forms for commands that take arguments.** A rule matches by prefix,
   so `git fetch*` would also allow `git fetch --upload-pack=<command>` and
   `pnpm install*` would allow `pnpm install <package>`. Those commands are
