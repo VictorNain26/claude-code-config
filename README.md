@@ -28,11 +28,11 @@ for your team.
   a prompt ([permissions](https://code.claude.com/docs/en/permissions)).
 - **Ask first**, for rare, irreversible or public actions: force pushes and
   remote branch deletion, local branch and tag deletion, skipping git hooks
-  (`--no-verify`, `git commit -n`, `core.hooksPath`); staging everything at
-  once (`git add -A`, `git add .`, `git commit -a`); adding, removing or
-  upgrading a dependency; `dlx`/`pnpx`/`bunx`/`uvx`; `docker exec`; `dd`,
-  `sudo`, `su`, `doas`, `pkexec`, `run0`; publishing and releases; merging or
-  closing a PR/MR; reading or editing a project `.npmrc`; editing shell
+  (`--no-verify`, `git commit -n`); staging everything at once (`git add -A`,
+  `git add .`, `git commit -a`); adding, removing or upgrading a dependency;
+  `dlx`/`pnpx`/`bunx`/`uvx`; `docker exec`; `dd`, `sudo`, `su`, `doas`,
+  `pkexec`, `run0`; publishing and releases; merging or closing a PR/MR;
+  reading or editing a project `.npmrc` or `bunfig.toml`; editing shell
   startup files.
 - **Denied**: secret files. In the project, `.env` and `.env.*` (templates
   such as `.env.example`, `.sample`, `.template`, `.dist` stay readable),
@@ -44,7 +44,8 @@ for your team.
   `~/.claude/.credentials.json`, at their default paths. Claude's file tools,
   `cat`-like commands and shell redirects can't read, create or edit them; a
   script can, which only the [sandbox](#sandbox) stops. Also `mkfs`,
-  `chmod -R 777` and `chmod 777 /`, with or without `sudo`.
+  `chmod -R 777` and `chmod 777` on an absolute path, with or without
+  `sudo`.
 
 Everything else, such as pushing, opening a PR, `reset --hard` or `rm -r`, is
 left to your permission mode. In auto mode, the default in a terminal since
