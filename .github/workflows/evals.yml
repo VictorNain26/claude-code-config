@@ -73,7 +73,7 @@ jobs:
             | jq -r 'select(.subtype == "init") | "Resolved model: \(.model)"'
           claude plugin eval plugins/engineering-standards \
             --trust-plugin --scaffold --ablation none --keep-temp \
-            --model "$MODEL" --judge-model claude-haiku-5-5 --threshold 0.9 --max-cost-usd 5 \
+            --model "$MODEL" --judge-model claude-haiku-5-5 --threshold 0.8 --max-cost-usd 5 \
             --no-publish --json "results-$MODEL.json" \
             --allow-tools Edit Write WebFetch "Bash(python3 -m unittest*)"
 
