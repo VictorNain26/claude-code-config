@@ -54,18 +54,23 @@ jobs:
           EOF
             sudo systemctl reload apparmor
           fi
-          bwrap --ro-bind / / true
+          bwrap --unshare-net --ro-bind / / true
+          command -v socat
 
       # Secrets are not passed to pull requests from forks.
+      - name: Note skipped evals
+        if: env.HAS_TOKEN != 'true'
+        run: echo "::notice::CLAUDE_CODE_OAUTH_TOKEN is not available; evals skipped."
+
+      # The gate is per check, not the weighted mean: a grader that fails in
+      # most runs fails the job; one failed run (a skill not loaded once, a
+      # split judge vote) is noise.
       - name: Run the eval suite
+        if: env.HAS_TOKEN == 'true'
         shell: bash
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
-          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
-            echo "::notice::CLAUDE_CODE_OAUTH_TOKEN is not available; evals skipped."
-            exit 0
-          fi
           claude --version
           # Aliases are deliberate: the suite exists to catch model changes.
           # Record which model the alias resolved to this week.
@@ -73,22 +78,30 @@ jobs:
             | jq -r 'select(.subtype == "init") | "Resolved model: \(.model)"'
           claude plugin eval plugins/engineering-standards \
             --trust-plugin --scaffold --ablation none --keep-temp \
-            --model "$MODEL" --judge-model claude-haiku-5-5 --threshold 0.8 --max-cost-usd 5 \
+            --model "$MODEL" --judge-model claude-haiku-5-5 --threshold 0 --max-cost-usd 5 \
             --no-publish --json "results-$MODEL.json" \
             --allow-tools Edit Write WebFetch "Bash(python3 -m unittest*)"
+          failing=$(jq -r '
+            .cases[] | .name as $case
+            | [.arms.with[].graders[] | {name, passed}] | group_by(.name)[]
+            | {name: .[0].name, failed: (map(select(.passed == false)) | length), runs: length}
+            | select(.failed * 2 > .runs)
+            | "\($case): \(.name) failed in \(.failed) of \(.runs) runs"
+          ' "results-$MODEL.json")
+          if [ -n "$failing" ]; then
+            echo "$failing"
+            echo "::error::A check failed in most runs."
+            exit 1
+          fi
 
       # Measures what the plugin adds over no plugin; reports, never gates.
       # Graders on the Skill tool are left out of both arms' scores.
       - name: Run the suite with and without the plugin
-        if: ${{ !cancelled() && github.event_name != 'pull_request' && matrix.model == 'sonnet' }}
+        if: ${{ !cancelled() && env.HAS_TOKEN == 'true' && github.event_name != 'pull_request' && matrix.model == 'sonnet' }}
         shell: bash
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
-          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
-            echo "::notice::CLAUDE_CODE_OAUTH_TOKEN is not available; baseline skipped."
-            exit 0
-          fi
           resolved=$(claude -p --model "$MODEL" --output-format stream-json --verbose "Reply ok" \
             | jq -r 'select(.subtype == "init") | .model')
           status=0
