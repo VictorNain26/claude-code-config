@@ -4,8 +4,8 @@
 [![evals](https://github.com/VictorNain26/claude-code-config/actions/workflows/evals.yml/badge.svg)](https://github.com/VictorNain26/claude-code-config/actions/workflows/evals.yml)
 
 A ready-to-use [Claude Code](https://code.claude.com/docs) environment you opt
-into: safe permission defaults, shared working rules, and skills that load
-only on the files they apply to. Install it once; `git pull` updates the
+into: safe permission defaults, shared working rules, and skills Claude
+loads for the work they cover. Install it once; `git pull` updates the
 settings and rules, and the plugin updates itself. Use it as is, or fork it
 for your team.
 
@@ -15,7 +15,7 @@ for your team.
 |---|---|---|
 | `config/settings.json` | permissions, bypass mode disabled, the plugin below | a settings file linked into the managed-settings drop-in directory ([managed-settings](https://code.claude.com/docs/en/managed-settings)) |
 | `config/AGENTS.md` | working rules: reuse before writing, verify before claiming, code and git conventions | imported from your own `~/.claude/CLAUDE.md` ([memory](https://code.claude.com/docs/en/memory)); other agents read it as is ([other coding agents](#other-coding-agents)) |
-| `plugins/engineering-standards/` | skills `ui-design`, `tests`, `third-party-config`, each loaded when Claude works on matching files | plugin from this repository's marketplace |
+| `plugins/engineering-standards/` | skills `ui-design`, `tests`, `third-party-config`, each loaded when Claude works on the task it covers | plugin from this repository's marketplace |
 
 ### Permissions
 
@@ -449,16 +449,17 @@ installed copies stay on the old version until it changes.
 The skills have a `claude plugin eval` suite in
 `plugins/engineering-standards/evals/`, run in CI on `opus` and `sonnet` when
 the plugin changes and every week, against model aliases on purpose and a
-pinned judge. A case passes at a mean score of 0.8 over three runs: with the
-current weights, a skill that doesn't load, or a required check that fails,
-in two runs of three fails the case, and a single run does not. Sonnet
-sometimes skips a skill it should load, and the haiku judge sometimes votes
-down a correct answer; at 0.9, one such run turned two CI attempts red in a
-row. A model or Claude Code change that breaks a skill still shows up
-([plugin-evals](https://code.claude.com/docs/en/plugin-evals)), and the
-weekly summary counts the runs that loaded each skill. The weekly run also
-repeats the suite on sonnet without the plugin and reports the difference,
-`Δ`, in the job summary: a high score alone doesn't show the skills helped.
+pinned judge. The job fails when any grader fails in two runs of three; a
+single failed run is noise, since sonnet sometimes skips a skill it should
+load and the haiku judge sometimes votes down a correct answer. A model or
+Claude Code change that breaks a skill or a behavior still shows up
+([plugin-evals](https://code.claude.com/docs/en/plugin-evals)).
+`claude plugin eval` only gates on a weighted mean, which can't both tolerate
+one bad run and require every check, so a `jq` check reads the results
+instead, and the weights only shape `Δ`. The weekly run also repeats the
+suite on sonnet without the plugin and reports `Δ` and the runs that loaded
+each skill in the job summary: a high score alone doesn't show the skills
+helped.
 One case lets Claude run `python3 -m unittest`, so CI installs the sandbox
 those commands run in. A machine with these settings installed can't evaluate
 a local copy, because the managed `enabledPlugins` locks the installed

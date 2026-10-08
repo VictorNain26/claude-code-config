@@ -6,7 +6,7 @@
     {
       "name": "engineering-standards",
       "source": "./plugins/engineering-standards",
-      "description": "Engineering defaults that load by file path: UI work, tests, third-party config files"
+      "description": "Engineering defaults for UI work, tests and third-party config files"
     }
   ]
 }
