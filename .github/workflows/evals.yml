@@ -24,6 +24,7 @@ jobs:
         model: [opus, sonnet]
     env:
       MODEL: ${{ matrix.model }}
+      HAS_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -37,6 +38,7 @@ jobs:
       # A Bash grant runs every command in the sandbox, which needs bubblewrap
       # and socat, and on Ubuntu 24.04+ an AppArmor profile for bwrap.
       - name: Set up the sandbox
+        if: env.HAS_TOKEN == 'true'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq bubblewrap socat
@@ -52,6 +54,7 @@ jobs:
           EOF
             sudo systemctl reload apparmor
           fi
+          bwrap --ro-bind / / true
 
       # Secrets are not passed to pull requests from forks.
       - name: Run the eval suite

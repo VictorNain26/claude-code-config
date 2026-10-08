@@ -1,6 +1,6 @@
 ---
-type: tool_used
-tool: Bash
-input_match: 'unittest'
+type: regex
+target: trace
+pattern: 'Ran \d+ tests? in'
 weight: 0.25
 ---
