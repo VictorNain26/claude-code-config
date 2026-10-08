@@ -27,18 +27,21 @@ for your team.
   Read-only git and shell commands need no rule: Claude Code runs them without
   a prompt ([permissions](https://code.claude.com/docs/en/permissions)).
 - **Ask first**, for rare, irreversible or public actions: force pushes and
-  remote branch deletion, local branch and tag deletion, `--no-verify`;
-  staging everything at once (`git add -A`, `git add .`, `git commit -a`);
-  adding, removing or upgrading a dependency; `dlx`/`bunx`; `docker exec`;
-  `dd` and `sudo rm`; publishing and releases; merging or closing a PR/MR;
-  reading or editing a project `.npmrc`; editing shell startup files.
+  remote branch deletion, local branch and tag deletion, `--no-verify` and
+  `git commit -n`; staging everything at once (`git add -A`, `git add .`,
+  `git commit -a`); adding, removing or upgrading a dependency;
+  `dlx`/`bunx`/`uvx`; `docker exec`; `dd` and any `sudo` command; publishing
+  and releases; merging or closing a PR/MR; reading or editing a project
+  `.npmrc`; editing shell startup files.
 - **Denied**: secret files. In the project, `.env` and `.env.*` (templates
   such as `.env.example`, `.sample`, `.template`, `.dist` stay readable),
-  `.envrc`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, `secrets.*`; in your
-  home directory, `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.azure`, `~/.kube`, the `gh`
-  and `gcloud` configs, `~/.docker/config.json`, `~/.git-credentials`,
-  `~/.netrc`, `~/.npmrc`, `~/.pypirc`, `~/.claude/.credentials.json`. Claude
-  can't read, create or edit them; you do. Also `mkfs` and `chmod 777`.
+  `.envrc`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, `secrets.json`,
+  `secrets.yaml`, `secrets.yml`, `secrets.toml`; in your home directory,
+  `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.azure`, `~/.kube`, the `gh`, `glab` and
+  `gcloud` configs, uv's credential store, `~/.docker/config.json`,
+  `~/.git-credentials`, `~/.netrc`, `~/.npmrc`, `~/.pypirc`,
+  `~/.claude/.credentials.json`. Claude can't read, create or edit them; you
+  do. Also `mkfs`, and `chmod 777` on `/` or recursively.
 
 Everything else, such as pushing, opening a PR, `reset --hard` or `rm -r`, is
 left to your permission mode. In auto mode, the default in a terminal since
@@ -343,7 +346,12 @@ as administrator. Then delete the `@…/config/AGENTS.md` line from
   Secret files are the exception: only a `deny` also covers `cat`, `head` and
   the like in Bash (an `ask` rule on `.env` let `cat .env` through in a test
   on 2.1.288), and a `Read` deny also blocks editing and creating the file
-  (same page). So are `mkfs` and `chmod 777`, which no coding task needs.
+  with Claude's file tools (same page). Shell redirects and `tee` are checked
+  against `Edit` rules only
+  ([permissions](https://code.claude.com/docs/en/permissions#redirections)),
+  so each secret also has an `Edit` deny: without it, `echo x > .env` created
+  the file without a prompt on 2.1.294. So are `mkfs` and `chmod 777`, which
+  no coding task needs.
 - **A rule that must always hold is also a permission.** CLAUDE.md is context,
   not enforced configuration
   ([memory](https://code.claude.com/docs/en/memory)), while an ask rule
@@ -355,7 +363,12 @@ as administrator. Then delete the `@…/config/AGENTS.md` line from
 - **Exact forms for commands that take arguments.** A rule matches by prefix,
   so `git fetch*` would also allow `git fetch --upload-pack=<command>` and
   `pnpm install*` would allow `pnpm install <package>`. Those commands are
-  allowed only without arguments.
+  allowed only without arguments. The other way round, an ask rule must
+  cover every spelling of what it guards: `-n` for `--no-verify`, `-d` for
+  `--delete`, the flag before or after the remote. `sudo` isn't among the
+  wrappers Claude Code strips before matching
+  ([permissions](https://code.claude.com/docs/en/permissions#process-wrappers)),
+  so `sudo mkfs` would slip past a `mkfs` rule: every `sudo` command asks.
 - **Dependency changes ask.** `config/AGENTS.md` requires vetting every new
   dependency; the prompt is where that happens. `npx` has no allow rule for
   the same reason: without a terminal it installs a missing package without
