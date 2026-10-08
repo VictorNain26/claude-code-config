@@ -393,7 +393,7 @@ as administrator. Then delete the `@…/config/AGENTS.md` line from
 - **Bypass mode is disabled** (`disableBypassPermissionsMode`, as in
   Anthropic's managed-settings examples): skipping every check would void the
   rest.
-- **A short, mostly negative rule file.** `config/AGENTS.md` is about 60
+- **A short, mostly negative rule file.** `config/AGENTS.md` is about 70
   lines. Claude Opus 4 and Claude 3.7 Sonnet follow 99.6–100% of 50
   simultaneous instructions, Claude 3.5 Haiku 78%
   ([IFScale, 2025](https://arxiv.org/abs/2507.11538)), and in more than 5,000
@@ -406,8 +406,14 @@ as administrator. Then delete the `@…/config/AGENTS.md` line from
   this file.
 - **Skills instead of rules.** A plugin can't ship CLAUDE.md or `rules/`
   ([plugins-reference](https://code.claude.com/docs/en/plugins-reference#standard-layout));
-  a skill with `paths` loads on the same files
-  ([skills](https://code.claude.com/docs/en/skills)).
+  a skill takes `paths` in the same format
+  ([skills](https://code.claude.com/docs/en/skills)), but its description
+  decides whether Claude loads it: in CI, sonnet read a test file without
+  loading the `tests` skill until its description named the situation. A rule that must
+  hold even when a skill doesn't load also goes in `config/AGENTS.md`: under
+  repeated test failures, sonnet edited the failing test in 3 of 3 runs
+  without the `tests` skill and in none where it loaded, and it didn't load
+  in 1 of 6 runs.
 - **No hooks, agents or MCP servers forced on you.** Each one runs code, costs
   latency or widens what leaves the machine; the [add-ons](#optional-add-ons)
   stay opt-in.
