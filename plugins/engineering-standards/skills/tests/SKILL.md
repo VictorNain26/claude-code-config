@@ -1,7 +1,7 @@
 ---
 name: tests
 user-invocable: false
-description: What makes a test worth keeping: it can fail for the right reason, mocks are not the thing under test, external dependencies get a contract test, and code runs before it is called done. Use when writing, changing or reviewing tests.
+description: What makes a test worth keeping: it is seen failing for the right reason, its expected values come from the requirement, a failing test is never edited to pass, mocks are not the thing under test, external dependencies get a contract test, and code runs before it is called done. Use when writing, changing or reviewing tests.
 paths:
   - "**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}"
   - "**/*_test.go"
@@ -20,6 +20,18 @@ Name the breakage before writing the test: which change to production code
 would make it fail? Without an answer the test is worth nothing. If it can only
 fail on an intentional decision — a constant's value, an exact label — it is a
 change detector: it rings on refactors and sleeps through bugs.
+
+See it fail first. Run a new test against the code without your change and
+check that it fails with the message you expect; a test that never failed
+hasn't shown it can. A bug fix starts with a test that reproduces the bug.
+
+The expected value comes from the requirement, not from running the code:
+copying today's output into an assertion freezes today's bug. The exception is
+a characterization test, written on purpose to pin behavior before a refactor.
+
+A failing test is never edited, skipped or deleted to make it pass, and the
+code never special-cases test inputs. When a test contradicts the requirement
+or another test, stop and say which, instead of picking one.
 
 A double is never the thing under test. An assertion on a mock passes because
 the mock is there. Assert on real behavior, or don't assert.

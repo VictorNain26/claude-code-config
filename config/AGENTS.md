@@ -37,6 +37,8 @@
 - No `eslint-disable`: it hides the problem. Find the code shape that doesn't
   trigger the rule. Same for any obstacle: don't work around the symptom, fix
   the cause.
+- Never edit, skip or delete a failing test to make it pass, nor special-case
+  test inputs: when a test contradicts the requirement, stop and say so.
 - No defensive guard between two of your own functions: strict validation
   belongs at the boundaries only, such as user input and external APIs.
 - Don't change anything outside the requested scope: it goes in a separate PR.
