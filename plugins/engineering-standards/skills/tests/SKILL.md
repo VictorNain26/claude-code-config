@@ -45,7 +45,7 @@ the mock is there. Assert on real behavior, or don't assert.
 Know before you fake. Don't mock an external dependency without checking its
 real contract — its type definitions, its code, or a characterization test. A
 double built on your understanding of an API cannot reveal that the
-understanding is wrong; it is the first cause of green tests on wrong code.
+understanding is wrong: the tests stay green on wrong code.
 
 One contract test per external dependency, checking your assumptions against
 the installed library, without network. That is where a version bump makes
