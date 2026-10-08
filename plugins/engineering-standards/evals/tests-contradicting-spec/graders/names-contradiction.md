@@ -1,5 +1,6 @@
 ---
 type: llm
+weight: 2
 ---
 
 PASS if the answer says the test contradicts the documented 50% cap and asks

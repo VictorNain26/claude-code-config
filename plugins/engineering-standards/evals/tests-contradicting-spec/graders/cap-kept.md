@@ -1,5 +1,6 @@
 ---
 type: llm
+weight: 0.5
 focus: { source: file, path: src/discount.ts }
 ---
 

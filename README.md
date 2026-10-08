@@ -384,7 +384,7 @@ as administrator. Then delete the `@…/config/AGENTS.md` line from
 - **Bypass mode is disabled** (`disableBypassPermissionsMode`, as in
   Anthropic's managed-settings examples): skipping every check would void the
   rest.
-- **A short, mostly negative rule file.** `config/AGENTS.md` is about 70
+- **A short, mostly negative rule file.** `config/AGENTS.md` is about 60
   lines. Claude Opus 4 and Claude 3.7 Sonnet follow 99.6–100% of 50
   simultaneous instructions, Claude 3.5 Haiku 78%
   ([IFScale, 2025](https://arxiv.org/abs/2507.11538)), and in more than 5,000
