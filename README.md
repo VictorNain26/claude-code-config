@@ -442,9 +442,13 @@ installed copies stay on the old version until it changes.
 
 The skills have a `claude plugin eval` suite in
 `plugins/engineering-standards/evals/`, run in CI on `opus` and `sonnet` when
-the plugin changes and every week. Each case fails when its skill stops
-loading, so a model or Claude Code change that breaks a skill shows up
-([plugin-evals](https://code.claude.com/docs/en/plugin-evals)). A machine with
+the plugin changes and every week, against model aliases on purpose and a
+pinned judge. A case passes at a mean score of 0.9 over three runs, so it
+fails when its skill doesn't load in even one run, and a model or Claude Code
+change that breaks a skill shows up
+([plugin-evals](https://code.claude.com/docs/en/plugin-evals)). The weekly run
+also repeats the suite without the plugin and reports the difference, `Δ`, in
+the job summary: a high score alone doesn't show the skills helped. A machine with
 these settings installed can't evaluate a local copy, because the managed
 `enabledPlugins` locks the installed plugin: let CI run the suite, or use a
 machine without the link.
