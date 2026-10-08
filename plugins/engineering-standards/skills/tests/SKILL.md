@@ -1,7 +1,8 @@
 ---
 name: tests
 user-invocable: false
-description: What makes a test worth keeping: a bug fix starts with a test seen failing, expected values come from the requirement, a failing test is not edited to pass unless the requested change made it obsolete, mocks are not the thing under test, external dependencies get a contract test, and code runs before it is called done. Use when writing, changing or reviewing tests, or making a failing test pass.
+description: "Use when writing, changing, reviewing or fixing tests, including when a test or CI fails and must pass. Rules: a bug fix starts with a test seen failing, expected values come from the requirement, a failing test is not edited to pass unless the requested change made it obsolete, mocks are not the thing under test, external dependencies get a contract test, and code runs before it is called done."
+when_to_use: "A test fails, CI is red, the suite must pass, \"make the tests pass\", \"fix the failing test\", \"is this a good test?\", adding or updating tests for a change."
 paths:
   - "**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}"
   - "**/*_test.go"

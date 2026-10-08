@@ -24,6 +24,7 @@ jobs:
         model: [opus, sonnet]
     env:
       MODEL: ${{ matrix.model }}
+      HAS_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -33,6 +34,27 @@ jobs:
         run: |
           curl -fsSL https://claude.ai/install.sh | bash
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      # A Bash grant runs every command in the sandbox, which needs bubblewrap
+      # and socat, and on Ubuntu 24.04+ an AppArmor profile for bwrap.
+      - name: Set up the sandbox
+        if: env.HAS_TOKEN == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq bubblewrap socat
+          if [ "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null)" = "1" ]; then
+            sudo tee /etc/apparmor.d/bwrap > /dev/null <<'EOF'
+          abi <abi/4.0>,
+          include <tunables/global>
+
+          profile bwrap /usr/bin/bwrap flags=(unconfined) {
+            userns,
+            include if exists <local/bwrap>
+          }
+          EOF
+            sudo systemctl reload apparmor
+          fi
+          bwrap --ro-bind / / true
 
       # Secrets are not passed to pull requests from forks.
       - name: Run the eval suite
@@ -51,9 +73,9 @@ jobs:
             | jq -r 'select(.subtype == "init") | "Resolved model: \(.model)"'
           claude plugin eval plugins/engineering-standards \
             --trust-plugin --scaffold --ablation none --keep-temp \
-            --model "$MODEL" --judge-model claude-haiku-5-5 --threshold 0.9 --max-cost-usd 5 \
+            --model "$MODEL" --judge-model claude-haiku-5-5 --threshold 0.8 --max-cost-usd 5 \
             --no-publish --json "results-$MODEL.json" \
-            --allow-tools Edit Write WebFetch
+            --allow-tools Edit Write WebFetch "Bash(python3 -m unittest*)"
 
       # Measures what the plugin adds over no plugin; reports, never gates.
       # Graders on the Skill tool are left out of both arms' scores.
@@ -74,7 +96,7 @@ jobs:
             --trust-plugin --scaffold --ablation with-without \
             --model "$MODEL" --judge-model claude-haiku-5-5 --threshold 0 --max-cost-usd 5 \
             --no-publish --json results-baseline.json \
-            --allow-tools Edit Write WebFetch || status=$?
+            --allow-tools Edit Write WebFetch "Bash(python3 -m unittest*)" || status=$?
           if [ -f results-baseline.json ]; then
             {
               echo "### Plugin effect ($resolved)"

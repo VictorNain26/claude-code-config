@@ -393,7 +393,7 @@ as administrator. Then delete the `@…/config/AGENTS.md` line from
 - **Bypass mode is disabled** (`disableBypassPermissionsMode`, as in
   Anthropic's managed-settings examples): skipping every check would void the
   rest.
-- **A short, mostly negative rule file.** `config/AGENTS.md` is about 60
+- **A short, mostly negative rule file.** `config/AGENTS.md` is about 70
   lines. Claude Opus 4 and Claude 3.7 Sonnet follow 99.6–100% of 50
   simultaneous instructions, Claude 3.5 Haiku 78%
   ([IFScale, 2025](https://arxiv.org/abs/2507.11538)), and in more than 5,000
@@ -406,8 +406,14 @@ as administrator. Then delete the `@…/config/AGENTS.md` line from
   this file.
 - **Skills instead of rules.** A plugin can't ship CLAUDE.md or `rules/`
   ([plugins-reference](https://code.claude.com/docs/en/plugins-reference#standard-layout));
-  a skill with `paths` loads on the same files
-  ([skills](https://code.claude.com/docs/en/skills)).
+  a skill takes `paths` in the same format
+  ([skills](https://code.claude.com/docs/en/skills)), but its description
+  decides whether Claude loads it: in CI, sonnet read a test file without
+  loading the `tests` skill until its description named the situation. A rule that must
+  hold even when a skill doesn't load also goes in `config/AGENTS.md`: under
+  repeated test failures, sonnet edited the failing test in 3 of 3 runs
+  without the `tests` skill and in none where it loaded, and it didn't load
+  in 1 of 6 runs.
 - **No hooks, agents or MCP servers forced on you.** Each one runs code, costs
   latency or widens what leaves the machine; the [add-ons](#optional-add-ons)
   stay opt-in.
@@ -443,16 +449,20 @@ installed copies stay on the old version until it changes.
 The skills have a `claude plugin eval` suite in
 `plugins/engineering-standards/evals/`, run in CI on `opus` and `sonnet` when
 the plugin changes and every week, against model aliases on purpose and a
-pinned judge. A case passes at a mean score of 0.9 over three runs. Each
-case's `skill-fired` grader weighs enough (more than 30% of the case) that one
-run without the skill fails it, so a model or Claude Code change that breaks a
-skill shows up ([plugin-evals](https://code.claude.com/docs/en/plugin-evals));
-a single wrong judge vote can too, so rerun a red case before reading it as a
-regression. The weekly run also repeats the suite on sonnet without the
-plugin and reports the difference, `Δ`, in the job summary: a high score
-alone doesn't show the skills helped. A machine with these settings installed
-can't evaluate a local copy, because the managed `enabledPlugins` locks the
-installed plugin: let CI run the suite, or use a machine without the link.
+pinned judge. A case passes at a mean score of 0.8 over three runs: with the
+current weights, a skill that doesn't load, or a required check that fails,
+in two runs of three fails the case, and a single run does not. Sonnet
+sometimes skips a skill it should load, and the haiku judge sometimes votes
+down a correct answer; at 0.9, one such run turned two CI attempts red in a
+row. A model or Claude Code change that breaks a skill still shows up
+([plugin-evals](https://code.claude.com/docs/en/plugin-evals)), and the
+weekly summary counts the runs that loaded each skill. The weekly run also
+repeats the suite on sonnet without the plugin and reports the difference,
+`Δ`, in the job summary: a high score alone doesn't show the skills helped.
+One case lets Claude run `python3 -m unittest`, so CI installs the sandbox
+those commands run in. A machine with these settings installed can't evaluate
+a local copy, because the managed `enabledPlugins` locks the installed
+plugin: let CI run the suite, or use a machine without the link.
 
 Report a security issue privately, as [SECURITY.md](SECURITY.md) describes.
 

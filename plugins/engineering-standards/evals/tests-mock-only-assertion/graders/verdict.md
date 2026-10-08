@@ -1,5 +1,6 @@
 ---
 type: llm
+weight: 2
 ---
 
 PASS if the answer says the test would still pass if `priceWithTax` computed
