@@ -30,10 +30,9 @@ for your team.
   remote branch deletion, local branch and tag deletion, skipping git hooks
   (`--no-verify`, `git commit -n`); staging everything at once (`git add -A`,
   `git add .`, `git commit -a`); adding, removing or upgrading a dependency;
-  `dlx`/`pnpx`/`bunx`/`uvx`; `docker exec`; `dd`, `sudo`, `su`, `doas`,
-  `pkexec`, `run0`; publishing and releases; merging or closing a PR/MR;
-  reading or editing a project `.npmrc` or `bunfig.toml`; editing shell
-  startup files.
+  `dlx`/`pnpx`/`bunx`/`uvx`; `docker exec`; `dd`, `sudo`, `su`; publishing
+  and releases; merging or closing a PR/MR; reading or editing a project
+  `.npmrc` or `bunfig.toml`; editing shell startup files.
 - **Denied**: secret files. In the project, `.env` and `.env.*` (templates
   such as `.env.example`, `.sample`, `.template`, `.dist` stay readable),
   `.envrc`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, `secrets.json`,

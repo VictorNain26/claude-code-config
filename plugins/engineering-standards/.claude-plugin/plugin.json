@@ -1,6 +1,6 @@
 {
   "name": "engineering-standards",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Engineering defaults for UI work, tests and third-party config files",
   "author": { "name": "VictorNain26", "url": "https://github.com/VictorNain26" },
   "repository": "https://github.com/VictorNain26/claude-code-config",
