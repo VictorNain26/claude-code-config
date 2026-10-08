@@ -450,9 +450,11 @@ skill shows up ([plugin-evals](https://code.claude.com/docs/en/plugin-evals));
 a single wrong judge vote can too, so rerun a red case before reading it as a
 regression. The weekly run also repeats the suite on sonnet without the
 plugin and reports the difference, `Δ`, in the job summary: a high score
-alone doesn't show the skills helped. A machine with these settings installed
-can't evaluate a local copy, because the managed `enabledPlugins` locks the
-installed plugin: let CI run the suite, or use a machine without the link.
+alone doesn't show the skills helped. One case lets Claude run
+`python3 -m unittest`, so CI installs the sandbox those commands run in. A
+machine with these settings installed can't evaluate a local copy, because
+the managed `enabledPlugins` locks the installed plugin: let CI run the
+suite, or use a machine without the link.
 
 Report a security issue privately, as [SECURITY.md](SECURITY.md) describes.
 
