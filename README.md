@@ -27,21 +27,25 @@ for your team.
   Read-only git and shell commands need no rule: Claude Code runs them without
   a prompt ([permissions](https://code.claude.com/docs/en/permissions)).
 - **Ask first**, for rare, irreversible or public actions: force pushes and
-  remote branch deletion, local branch and tag deletion, `--no-verify` and
-  `git commit -n`; staging everything at once (`git add -A`, `git add .`,
-  `git commit -a`); adding, removing or upgrading a dependency;
-  `dlx`/`bunx`/`uvx`; `docker exec`; `dd` and any `sudo` command; publishing
-  and releases; merging or closing a PR/MR; reading or editing a project
-  `.npmrc`; editing shell startup files.
+  remote branch deletion, local branch and tag deletion, skipping git hooks
+  (`--no-verify`, `git commit -n`); staging everything at once (`git add -A`,
+  `git add .`, `git commit -a`); adding, removing or upgrading a dependency;
+  `dlx`/`pnpx`/`bunx`/`uvx`; `docker exec`; `dd`, `sudo`, `su`, `doas`,
+  `pkexec`, `run0`; publishing and releases; merging or closing a PR/MR;
+  reading or editing a project `.npmrc` or `bunfig.toml`; editing shell
+  startup files.
 - **Denied**: secret files. In the project, `.env` and `.env.*` (templates
   such as `.env.example`, `.sample`, `.template`, `.dist` stay readable),
   `.envrc`, `*.pem`, `*.key`, `*.p12`, `credentials.json`, `secrets.json`,
   `secrets.yaml`, `secrets.yml`, `secrets.toml`; in your home directory,
   `~/.ssh`, `~/.aws`, `~/.gnupg`, `~/.azure`, `~/.kube`, the `gh`, `glab` and
   `gcloud` configs, uv's credential store, `~/.docker/config.json`,
-  `~/.git-credentials`, `~/.netrc`, `~/.npmrc`, `~/.pypirc`,
-  `~/.claude/.credentials.json`. Claude can't read, create or edit them; you
-  do. Also `mkfs`, and `chmod 777` on `/` or recursively.
+  `~/.git-credentials`, `~/.netrc`, `~/.npmrc`, `~/.pypirc`, `~/.bunfig.toml`,
+  `~/.claude/.credentials.json`, at their default paths. Claude's file tools,
+  `cat`-like commands and shell redirects can't read, create or edit them; a
+  script can, which only the [sandbox](#sandbox) stops. Also `mkfs`,
+  `chmod -R 777` and `chmod 777` on an absolute path, with or without
+  `sudo`.
 
 Everything else, such as pushing, opening a PR, `reset --hard` or `rm -r`, is
 left to your permission mode. In auto mode, the default in a terminal since
@@ -363,12 +367,17 @@ as administrator. Then delete the `@…/config/AGENTS.md` line from
 - **Exact forms for commands that take arguments.** A rule matches by prefix,
   so `git fetch*` would also allow `git fetch --upload-pack=<command>` and
   `pnpm install*` would allow `pnpm install <package>`. Those commands are
-  allowed only without arguments. The other way round, an ask rule must
-  cover every spelling of what it guards: `-n` for `--no-verify`, `-d` for
-  `--delete`, the flag before or after the remote. `sudo` isn't among the
-  wrappers Claude Code strips before matching
-  ([permissions](https://code.claude.com/docs/en/permissions#process-wrappers)),
-  so `sudo mkfs` would slip past a `mkfs` rule: every `sudo` command asks.
+  allowed only without arguments. The other way round, ask and deny rules
+  cover the spellings Claude usually writes: `-n` for `--no-verify`, `-d` for
+  `--delete`, the flag before or after the remote, `sudo` in front, which
+  Claude Code doesn't strip before matching
+  ([permissions](https://code.claude.com/docs/en/permissions#process-wrappers)).
+  They are not a security boundary: bundled short flags (`-qn`), options
+  before the subcommand (`git -C . push -f`) or a script
+  get past them
+  ([permissions](https://code.claude.com/docs/en/permissions#bash-rule-limits)).
+  The working rules, the auto-mode classifier and the sandbox are the other
+  layers.
 - **Dependency changes ask.** `config/AGENTS.md` requires vetting every new
   dependency; the prompt is where that happens. `npx` has no allow rule for
   the same reason: without a terminal it installs a missing package without
