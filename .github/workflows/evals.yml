@@ -51,9 +51,48 @@ jobs:
             | jq -r 'select(.subtype == "init") | "Resolved model: \(.model)"'
           claude plugin eval plugins/engineering-standards \
             --trust-plugin --scaffold --ablation none --keep-temp \
-            --model "$MODEL" --judge-model haiku --threshold 0.66 --max-cost-usd 5 \
+            --model "$MODEL" --judge-model claude-haiku-5-5 --threshold 0.9 --max-cost-usd 5 \
             --no-publish --json "results-$MODEL.json" \
             --allow-tools Edit Write WebFetch
+
+      # Measures what the plugin adds over no plugin; reports, never gates.
+      # Graders on the Skill tool are left out of both arms' scores.
+      - name: Run the suite with and without the plugin
+        if: ${{ !cancelled() && github.event_name != 'pull_request' && matrix.model == 'sonnet' }}
+        shell: bash
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "::notice::CLAUDE_CODE_OAUTH_TOKEN is not available; baseline skipped."
+            exit 0
+          fi
+          resolved=$(claude -p --model "$MODEL" --output-format stream-json --verbose "Reply ok" \
+            | jq -r 'select(.subtype == "init") | .model')
+          status=0
+          claude plugin eval plugins/engineering-standards \
+            --trust-plugin --scaffold --ablation with-without \
+            --model "$MODEL" --judge-model claude-haiku-5-5 --threshold 0 --max-cost-usd 5 \
+            --no-publish --json results-baseline.json \
+            --allow-tools Edit Write WebFetch || status=$?
+          if [ -f results-baseline.json ]; then
+            {
+              echo "### Plugin effect ($resolved)"
+              echo
+              jq -r 'if .partial then "**Partial run: \(.partialReason // "see the log"). Leave it out of any trend.**\n" else empty end' results-baseline.json
+              echo "| Case | With | Without | Δ | Skill loaded |"
+              echo "|---|---|---|---|---|"
+              jq -r '
+                def r: if . == null then "n/a" else (. * 100 | round / 100 | tostring) end;
+                .cases[]
+                | ([.arms.with[]? | [.graders[]? | select(.name == "skill-fired") | .passed] | any] | map(select(.)) | length) as $loaded
+                | "| \(.name) | \(.aggregates.score | r) | \(if .aggregates.delta == null then null else .aggregates.score - .aggregates.delta end | r) | \(.aggregates.delta | r) | \($loaded)/\(.arms.with | length) |"
+              ' results-baseline.json
+              echo
+              jq -r '"Mean Δ: \(.aggregates.meanDelta // "n/a")"' results-baseline.json
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$status"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
@@ -71,3 +110,4 @@ jobs:
           name: eval-traces-${{ matrix.model }}
           path: /tmp/claude-eval-*/out/trace.jsonl
           if-no-files-found: ignore
+
