@@ -1,8 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "env": {
-    "CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION": "6000"
-  },
   "permissions": {
     "deny": [
       "Read(~/**/.env)",
@@ -56,15 +53,6 @@
   },
   "deniedMcpServers": [
     {
-      "serverName": "claude.ai Booking.com"
-    },
-    {
-      "serverName": "claude.ai Canva"
-    },
-    {
-      "serverName": "claude.ai Figma"
-    },
-    {
       "serverName": "claude.ai Gmail"
     },
     {
@@ -81,54 +69,6 @@
     },
     {
       "serverName": "claude.ai Google Slides"
-    },
-    {
-      "serverName": "claude.ai HubSpot"
-    },
-    {
-      "serverName": "claude.ai Hugging Face"
-    },
-    {
-      "serverName": "claude.ai Indeed"
-    },
-    {
-      "serverName": "claude.ai Make"
-    },
-    {
-      "serverName": "claude.ai Notion"
-    },
-    {
-      "serverName": "claude.ai Slack"
-    },
-    {
-      "serverName": "claude.ai Sprouts Data Intelligence"
-    },
-    {
-      "serverName": "claude.ai Strava"
-    },
-    {
-      "serverName": "claude.ai Supabase"
-    },
-    {
-      "serverName": "claude.ai Three.js 3D Viewer"
-    },
-    {
-      "serverName": "claude.ai Tripadvisor"
-    },
-    {
-      "serverName": "claude.ai Uber Eats"
-    },
-    {
-      "serverName": "claude.ai Vercel"
-    },
-    {
-      "serverName": "claude.ai Vibe Prospecting"
-    },
-    {
-      "serverName": "claude.ai ZipRecruiter"
-    },
-    {
-      "serverName": "claude.ai higgsfield"
     }
   ],
   "statusLine": {
