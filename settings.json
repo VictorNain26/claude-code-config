@@ -76,10 +76,6 @@
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
-    "marketing@synced": false,
-    "engineering@synced": false,
-    "cowork-plugin-management@synced": false,
-    "frontend-design@synced": false,
     "typescript-lsp@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "ruby-lsp@claude-plugins-official": true,
@@ -163,5 +159,6 @@
     "chrome-browser": "off",
     "built-in-browser": "off",
     "computer-use": "off"
-  }
+  },
+  "syncClaudeAiPlugins": false
 }
