@@ -1,0 +1,9 @@
+# Whitelist: only the configuration written by hand. Transcripts, history, credentials,
+# plugins and caches stay out (see code.claude.com/docs/en/claude-directory#application-data).
+/*
+!/.gitignore
+!/README.md
+!/CLAUDE.md
+!/settings.json
+!/statusline.sh
+!/rules/

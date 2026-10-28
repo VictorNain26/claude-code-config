@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION": "6000"
+  },
+  "permissions": {
+    "deny": [
+      "Read(~/**/.env)",
+      "Read(~/**/.env.local)",
+      "Read(~/**/.env.*.local)",
+      "Read(~/**/.env.development)",
+      "Read(~/**/.env.test)",
+      "Read(~/**/.env.staging)",
+      "Read(~/**/.env.production)",
+      "Read(~/**/*.key)",
+      "Read(~/**/*.p12)",
+      "Read(~/.ssh/**)",
+      "Read(~/.config/gh/hosts.yml)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(~/**/.dev.vars)",
+      "Read(~/.docker/config.json)",
+      "Read(~/.config/clever-cloud/**)",
+      "Read(~/.config/.wrangler/config/**)",
+      "Read(~/.local/share/com.vercel.cli/auth.json)",
+      "Edit(**/.git/hooks/**)",
+      "Edit(**/.git/config)"
+    ],
+    "ask": [
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(*DROP DATABASE*)",
+      "Bash(*drop database*)",
+      "Bash(*DROP SCHEMA*)",
+      "Bash(*drop schema*)",
+      "Bash(*TRUNCATE*)",
+      "Bash(*truncate table*)",
+      "Bash(dropdb *)",
+      "Bash(*docker compose down -v*)",
+      "Bash(*docker compose down --volumes*)",
+      "Bash(*docker volume rm*)",
+      "Bash(*docker system prune*)",
+      "Bash(*wrangler deploy*)",
+      "Bash(*vercel --prod*)",
+      "Bash(*vercel deploy --prod*)",
+      "Bash(npm publish*)",
+      "Bash(pnpm publish*)",
+      "Bash(rm -r*)",
+      "Bash(rm -R*)",
+      "Bash(rm -f*r*)",
+      "Bash(rm -f*R*)",
+      "Bash(git push *--force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * -f*)",
+      "Bash(git push * +*)"
+    ]
+  },
+  "deniedMcpServers": [
+    {
+      "serverName": "claude.ai Booking.com"
+    },
+    {
+      "serverName": "claude.ai Canva"
+    },
+    {
+      "serverName": "claude.ai Figma"
+    },
+    {
+      "serverName": "claude.ai Gmail"
+    },
+    {
+      "serverName": "claude.ai Google Calendar"
+    },
+    {
+      "serverName": "claude.ai Google Docs"
+    },
+    {
+      "serverName": "claude.ai Google Drive"
+    },
+    {
+      "serverName": "claude.ai Google Sheets"
+    },
+    {
+      "serverName": "claude.ai Google Slides"
+    },
+    {
+      "serverName": "claude.ai HubSpot"
+    },
+    {
+      "serverName": "claude.ai Hugging Face"
+    },
+    {
+      "serverName": "claude.ai Indeed"
+    },
+    {
+      "serverName": "claude.ai Make"
+    },
+    {
+      "serverName": "claude.ai Notion"
+    },
+    {
+      "serverName": "claude.ai Slack"
+    },
+    {
+      "serverName": "claude.ai Sprouts Data Intelligence"
+    },
+    {
+      "serverName": "claude.ai Strava"
+    },
+    {
+      "serverName": "claude.ai Supabase"
+    },
+    {
+      "serverName": "claude.ai Three.js 3D Viewer"
+    },
+    {
+      "serverName": "claude.ai Tripadvisor"
+    },
+    {
+      "serverName": "claude.ai Uber Eats"
+    },
+    {
+      "serverName": "claude.ai Vercel"
+    },
+    {
+      "serverName": "claude.ai Vibe Prospecting"
+    },
+    {
+      "serverName": "claude.ai ZipRecruiter"
+    },
+    {
+      "serverName": "claude.ai higgsfield"
+    }
+  ],
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "marketing@synced": false,
+    "engineering@synced": false,
+    "cowork-plugin-management@synced": false,
+    "frontend-design@synced": false,
+    "typescript-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "ruby-lsp@claude-plugins-official": true,
+    "cloudflare@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {},
+  "language": "french",
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowedDomains": [
+        "registry.npmjs.org",
+        "registry.yarnpkg.com",
+        "github.com",
+        "*.github.com",
+        "*.githubusercontent.com",
+        "pypi.org",
+        "files.pythonhosted.org",
+        "bun.sh",
+        "*.cloudflare.com",
+        "*.vercel.com",
+        "rubygems.org",
+        "index.rubygems.org"
+      ],
+      "tlsTerminate": {}
+    },
+    "filesystem": {
+      "allowWrite": [
+        "~/.local/share/pnpm",
+        "~/.cache",
+        "~/.npm",
+        "~/.bun/install"
+      ],
+      "denyWrite": [
+        "~/.local/bin",
+        "~/.config",
+        "~/.npmrc",
+        "~/.ssh",
+        "~/.local/share/fnm",
+        "~/.local/state/fnm_multishells",
+        "~/.local/share/claude",
+        "~/.kimi-code",
+        "~/.claude/statusline.sh",
+        "~/.local/share/mise"
+      ]
+    },
+    "credentials": {
+      "files": [
+        {
+          "path": "~/.config/gh/hosts.yml",
+          "mode": "mask",
+          "extract": "oauth_token:\\s*(\\S+)",
+          "injectHosts": [
+            "api.github.com"
+          ]
+        }
+      ]
+    },
+    "excludedCommands": [
+      "docker ps *",
+      "docker logs *",
+      "docker inspect *",
+      "ssh victormoi@victorserv *",
+      "git push *",
+      "git fetch *",
+      "git pull --ff-only *"
+    ]
+  },
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
+  "showThinkingSummaries": true,
+  "skipWorkflowUsageWarning": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skillOverrides": {
+    "chrome-browser": "off",
+    "built-in-browser": "off",
+    "computer-use": "off"
+  }
+}
