@@ -1,5 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "syncClaudeAiPlugins": false,
+  "env": {
+    "GHIDRA_INSTALL_DIR": "/home/ordiv/.local/opt/ghidra_12.1.4_PUBLIC",
+    "REA_JADX_MCP_JAR": "/home/ordiv/.local/share/rea/android/jadx-headless-mcp-0.7.1-all.jar",
+    "REA_APKTOOL_COMMAND": "/home/ordiv/.local/share/apktool/apktool"
+  },
   "permissions": {
     "deny": [
       "Read(~/**/.env)",
@@ -51,6 +57,11 @@
       "Bash(git push * +*)"
     ]
   },
+  "skillOverrides": {
+    "chrome-browser": "off",
+    "built-in-browser": "off",
+    "computer-use": "off"
+  },
   "deniedMcpServers": [
     {
       "serverName": "claude.ai Gmail"
@@ -80,7 +91,16 @@
     "pyright-lsp@claude-plugins-official": true,
     "ruby-lsp@claude-plugins-official": true,
     "cloudflare@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "rea@rea": true
+  },
+  "extraKnownMarketplaces": {
+    "rea": {
+      "source": {
+        "source": "github",
+        "repo": "morluto/rea"
+      }
+    }
   },
   "language": "french",
   "sandbox": {
@@ -148,17 +168,11 @@
   },
   "modelSettings": {
     "claude-opus-5-5": {
-      "effortLevel": "medium"
+      "effortLevel": "high"
     }
   },
   "showThinkingSummaries": true,
   "skipWorkflowUsageWarning": true,
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
-  "skillOverrides": {
-    "chrome-browser": "off",
-    "built-in-browser": "off",
-    "computer-use": "off"
-  },
-  "syncClaudeAiPlugins": false
+  "agentPushNotifEnabled": true
 }
