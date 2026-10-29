@@ -15,7 +15,6 @@
 - Avant de construire, chercher l'outil maintenu ou le mécanisme natif qui le fait déjà : du code maison se maintient à vie.
 - Livrer ce qui est demandé, au périmètre voulu, sans fonctionnalité, abstraction ni gestion d'erreur pour un cas qui ne peut pas arriver. Si une meilleure approche existe, le dire en une phrase puis faire ce qui est demandé.
 - Réponses brèves, le résultat d'abord, le détail ensuite. Un document écrit a la longueur que le sujet exige, sans sections de remplissage.
-- Lire et modifier les fichiers avec Read, Edit et Write plutôt qu'en shell : `/rewind` ne restaure pas un fichier que seul Bash a modifié.
 
 ## Interdits
 - Jamais deux versions d'une même chose, ni un fichier sans usage : ce qu'une PR remplace, elle le supprime. Sinon on ne sait plus laquelle fait foi.
