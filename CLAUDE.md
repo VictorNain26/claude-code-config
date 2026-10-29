@@ -2,8 +2,7 @@
 
 - Code, identifiants, messages de commit et noms de branches en anglais. Commits au format Conventional Commits.
 - Nouveau projet : pnpm ou bun pour JS/TS ; uv, ruff, mypy strict et pytest pour Python, pydantic aux
-  frontières (API, config, fichiers externes) ; mise et `rails new` sans retirer ses outils par défaut
-  pour Ruby/Rails.
+  frontières (API, config, fichiers externes) ; mise et `rails new` pour Ruby/Rails.
 - Avant de dire qu'une tâche est finie, lance la vérification du projet indiquée dans son CLAUDE.md ou ses règles.
 - Pour un changement qui ne tient pas en une phrase, passer par le mode plan ; un plan nomme les fichiers et interfaces touchés, dit ce qui est hors périmètre et finit par une vérification de bout en bout.
 - Avant un merge, `/simplify` repère le code dupliqué ou réinventé, puis `/code-review` relit la branche dans un contexte neuf. Une PR sans code (doc, config) passe par `/code-review` seul : `/simplify` n'y a rien à chercher. Ne retenir que ce qui touche la correction ou les exigences du plan ; un constat retenu se corrige avant le merge.
