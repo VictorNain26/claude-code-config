@@ -5,8 +5,9 @@
   frontières (API, config, fichiers externes) ; mise et `rails new` pour Ruby/Rails.
 - Avant de dire qu'une tâche est finie, lance la vérification du projet indiquée dans son CLAUDE.md ou ses règles.
 - Pour un changement qui ne tient pas en une phrase, passer par le mode plan ; un plan nomme les fichiers et interfaces touchés, dit ce qui est hors périmètre et finit par une vérification de bout en bout.
-- Avant un merge, `/simplify` repère le code dupliqué ou réinventé, puis `/code-review` relit la branche dans un contexte neuf. Une PR sans code (doc, config) passe par `/code-review` seul : `/simplify` n'y a rien à chercher. Ne retenir que ce qui touche la correction ou les exigences du plan ; un constat retenu se corrige avant le merge.
-- Un sous-agent reçoit une seule PR, jamais une chaîne : le suivant part d'un contexte neuf. Toute commande de plus de 2 min tourne en arrière-plan ; une suite complète tourne en CI, pas en local.
+- Avant un merge, une seule `/code-review low` relit la branche dans un contexte neuf, contre le plan : correction et écarts au plan, sans le style. Une passe ; les correctifs ne sont pas relus à nouveau. La duplication est tenue par un outil en CI (jscpd, flay…) ; sans cet outil, `/simplify` passe avant la revue. Un constat retenu se corrige avant le merge, par la session courante quand il tient en quelques lignes.
+- Un sous-agent pour une grosse PR ou un travail parallèle, une seule PR par agent ; une petite PR ou des correctifs se font dans la session. Ne paralléliser que des branches indépendantes, jamais les étages d'une pile. Toute commande de plus de 2 min tourne en arrière-plan ; une suite complète tourne en CI, pas en local.
+- Avant un run sans surveillance : un critère d'arrêt écrit (ex. CI verte et revue traitée) et un plafond (`/goal`, `--max-turns` ou `--max-budget-usd`).
 - Lors d'une compaction, préserver : PR en cours, branche, plan en cours, dernière tâche terminée, décisions ouvertes.
 
 ## Fiabilité et périmètre
