@@ -24,7 +24,8 @@ projet.
 - `.claude/rules/<sujet>.md` avec `paths:` (chemins depuis la racine) : les conventions d'une
   partie du code, chargées quand on ouvre un de ses fichiers.
 - `.claude/skills/<nom>/` : une procédure qui ne sert que parfois.
-- `.claude/settings.json` à la racine : les garde-fous du projet. Claude se lance à la racine du
+- `.claude/settings.json` à la racine : les garde-fous du projet, dont un hook `Stop` qui lance la
+  vérification rapide (typecheck, lint) quand elle tient en quelques secondes. Claude se lance à la racine du
   dépôt, seul endroit où ce fichier est lu.
 - La doc pour humains reste dans `README.md` et `docs/` ; elle renvoie aux règles, sans les recopier.
 
