@@ -31,7 +31,13 @@
       "Edit(**/.git/hooks/**)",
       "Edit(**/.git/config)",
       "Edit(~/.local/bin/**)",
-      "Bash(ssh *victorserv*)"
+      "Bash(ssh *victorserv*)",
+      "Bash(git push *--rec*)",
+      "Bash(git push *--ex*)",
+      "Bash(git fetch *--upl*)",
+      "Bash(git fetch *--rec*)",
+      "Bash(git pull *--upl*)",
+      "Bash(git pull *--rec*)"
     ],
     "ask": [
       "Bash(victorserv admin *)",
@@ -167,9 +173,18 @@
       "docker inspect *",
       "victorserv admin *",
       "victorserv claude *",
-      "git push *",
-      "git fetch *",
-      "git pull --ff-only *"
+      "git push",
+      "git push origin *",
+      "git push -u origin *",
+      "git push --force-with-lease origin *",
+      "git fetch",
+      "git fetch origin",
+      "git fetch origin *",
+      "git fetch --prune origin",
+      "git fetch --prune origin *",
+      "git pull --ff-only",
+      "git pull --ff-only origin",
+      "git pull --ff-only origin *"
     ]
   },
   "modelSettings": {
