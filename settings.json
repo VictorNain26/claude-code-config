@@ -94,10 +94,6 @@
       "serverName": "claude.ai Google Slides"
     }
   ],
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  },
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
@@ -149,7 +145,6 @@
         "~/.npmrc",
         "~/.ssh",
         "~/.local/share/claude",
-        "~/.claude/statusline.sh",
         "~/.local/share/mise"
       ]
     },
