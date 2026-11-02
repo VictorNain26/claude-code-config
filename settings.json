@@ -86,20 +86,6 @@
       "serverName": "claude.ai Google Slides"
     }
   ],
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "if": "Bash(git push*)",
-            "command": "PATH=\"$HOME/.local/bin:$PATH\"; in=$(cat); cmd=$(printf '%s' \"$in\" | jq -r '.tool_input.command // \"\"'); d=$(printf '%s' \"$in\" | jq -r '.cwd // \".\"'); for p in \"$(printf '%s' \"$cmd\" | sed -nE 's/^[[:space:]]*cd[[:space:]]+([^;&|]*[^;&|[:space:]])[[:space:]]*(&&|;).*/\\1/p')\" \"$(printf '%s' \"$cmd\" | sed -nE 's/.*git[[:space:]]+-C[[:space:]]+([^[:space:]]+)[[:space:]].*/\\1/p')\"; do p=$(printf '%s' \"$p\" | tr -d \"\\\"'\"); case $p in '') ;; '~'*) d=\"$HOME${p#\\~}\";; /*) d=$p;; *) d=\"$d/$p\";; esac; done; br=$(git -C \"$d\" rev-parse --abbrev-ref HEAD 2>/dev/null); if [ \"$br\" = main ] || [ \"$br\" = master ] || printf '%s' \"$cmd\" | grep -Eq '(:|[[:space:]])\\+?(refs/heads/)?(main|master)([[:space:]]|$)'; then jq -n '{hookSpecificOutput:{hookEventName:\"PreToolUse\",permissionDecision:\"ask\",permissionDecisionReason:\"Push vers main : passer par une branche et une PR\"}}'; fi"
-          }
-        ]
-      }
-    ]
-  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
