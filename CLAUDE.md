@@ -24,3 +24,4 @@
 - Jamais de test décoratif : pas d'assertion triviale ; un service, un helper ou une validation modifié a son test, cas nominal et cas limites. Un test décoratif donne une confiance qu'il ne mérite pas.
 - Jamais un test instable dit réparé sans l'avoir vu échouer en répétition avant la correction et passer après, dans les mêmes conditions : sinon le passage peut n'être que de la chance.
 - Jamais un fait recopié dans la doc ou un CLAUDE.md : elle renvoie au code qui le porte, sinon elle dérive.
+- Jamais un `git push`, `fetch` ou `pull` combiné (`cd … &&`, `-C`, `|`, `;`, variable devant) ou vers autre chose qu'`origin` : seule la commande nue vers `origin` sort du sandbox (`sandbox.excludedCommands`), sinon elle échoue faute de réseau.
