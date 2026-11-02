@@ -32,10 +32,10 @@
       "Edit(**/.git/config)",
       "Edit(~/.local/bin/**)",
       "Bash(ssh *victorserv*)",
-      "Bash(git push *--receive-pack*)",
-      "Bash(git push *--exec*)",
-      "Bash(git fetch *--upload-pack*)",
-      "Bash(git pull *--upload-pack*)"
+      "Bash(git push *--rece*)",
+      "Bash(git push *--exe*)",
+      "Bash(git fetch *--upl*)",
+      "Bash(git pull *--upl*)"
     ],
     "ask": [
       "Bash(victorserv admin *)",
@@ -176,10 +176,13 @@
       "git push -u origin *",
       "git push --force-with-lease origin *",
       "git fetch",
-      "git fetch origin*",
-      "git fetch --prune origin*",
+      "git fetch origin",
+      "git fetch origin *",
+      "git fetch --prune origin",
+      "git fetch --prune origin *",
       "git pull --ff-only",
-      "git pull --ff-only origin*"
+      "git pull --ff-only origin",
+      "git pull --ff-only origin *"
     ]
   },
   "modelSettings": {
