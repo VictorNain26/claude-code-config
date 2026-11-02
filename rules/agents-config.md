@@ -27,7 +27,7 @@ projet.
 - `.claude/settings.json` à la racine : les garde-fous du projet, dont un hook `Stop` qui lance la
   vérification rapide (typecheck, lint) quand elle tient en quelques secondes. Claude se lance à la racine du
   dépôt, seul endroit où ce fichier est lu.
-- La doc pour humains reste dans `README.md` et `docs/`.
+- La doc pour humains reste dans `README.md` et `docs/` ; elle renvoie aux règles, sans les recopier.
 
 ## L'élagage
 
@@ -37,5 +37,8 @@ demander si la retirer ferait faire une erreur ; retirer sinon, ou transformer e
 
 ## Interdits
 
+- Jamais une règle en prose quand un contrôle automatique peut la tenir.
 - Jamais dans un projet une règle qui existe déjà dans `~/.claude/`, sauf si le dépôt est aussi ouvert
   sans `~/.claude` (CI, session cloud) : il garde alors ses propres garde-fous.
+- Jamais une règle, un skill ou un plugin qui refait ce qu'un outil intégré, un plugin installé ou un
+  MCP fait déjà : deux sources pour un même comportement finissent par se contredire.

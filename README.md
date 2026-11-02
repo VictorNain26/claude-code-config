@@ -2,7 +2,9 @@
 
 Victor's personal Claude Code configuration, versioned in place in `~/.claude`.
 
-What is versioned: the whitelist in `.gitignore`. Where each file belongs and how it loads:
+What is versioned: the whitelist in `.gitignore`. Everything else in `~/.claude` is data Claude Code
+writes itself (credentials, transcripts, history), which must never be committed. Where each file
+belongs and how it loads:
 https://code.claude.com/docs/en/claude-directory
 
 ## New machine
