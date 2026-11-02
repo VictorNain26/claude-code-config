@@ -140,10 +140,7 @@
         "~/.config",
         "~/.npmrc",
         "~/.ssh",
-        "~/.local/share/fnm",
-        "~/.local/state/fnm_multishells",
         "~/.local/share/claude",
-        "~/.kimi-code",
         "~/.claude/statusline.sh",
         "~/.local/share/mise"
       ]
