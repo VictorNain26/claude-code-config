@@ -8,7 +8,7 @@
   },
   "permissions": {
     "allow": [
-      "Bash(ssh victorserv-claude *)"
+      "Bash(victorserv claude *)"
     ],
     "deny": [
       "Read(~/**/.env)",
@@ -29,10 +29,12 @@
       "Read(~/.config/.wrangler/config/**)",
       "Read(~/.local/share/com.vercel.cli/auth.json)",
       "Edit(**/.git/hooks/**)",
-      "Edit(**/.git/config)"
+      "Edit(**/.git/config)",
+      "Edit(~/.local/bin/**)",
+      "Bash(ssh *victorserv*)"
     ],
     "ask": [
-      "Bash(ssh victormoi@victorserv *)",
+      "Bash(victorserv admin *)",
       "Bash(git reset --hard*)",
       "Bash(git clean -f*)",
       "Bash(*DROP DATABASE*)",
@@ -58,7 +60,17 @@
       "Bash(git push *--force*)",
       "Bash(git push -f*)",
       "Bash(git push * -f*)",
-      "Bash(git push * +*)"
+      "Bash(git push * +*)",
+      "Bash(gh repo delete*)",
+      "Bash(gh repo edit*)",
+      "Bash(gh repo deploy-key*)",
+      "Bash(gh secret*)",
+      "Bash(gh variable*)",
+      "Bash(gh api * -X *)",
+      "Bash(gh api * --method *)",
+      "Bash(gh api * -f *)",
+      "Bash(gh api * -F *)",
+      "Bash(gh api * --input *)"
     ]
   },
   "skillOverrides": {
@@ -161,8 +173,8 @@
       "docker ps *",
       "docker logs *",
       "docker inspect *",
-      "ssh victormoi@victorserv *",
-      "ssh victorserv-claude *",
+      "victorserv admin *",
+      "victorserv claude *",
       "git push *",
       "git fetch *",
       "git pull --ff-only *"
