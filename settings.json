@@ -66,11 +66,7 @@
       "Bash(gh repo deploy-key*)",
       "Bash(gh secret*)",
       "Bash(gh variable*)",
-      "Bash(gh api * -X *)",
-      "Bash(gh api * --method *)",
-      "Bash(gh api * -f *)",
-      "Bash(gh api * -F *)",
-      "Bash(gh api * --input *)"
+      "Bash(gh api *)"
     ]
   },
   "skillOverrides": {
@@ -164,7 +160,8 @@
           "mode": "mask",
           "extract": "oauth_token:\\s*(\\S+)",
           "injectHosts": [
-            "api.github.com"
+            "api.github.com",
+            "github.com"
           ]
         }
       ]
