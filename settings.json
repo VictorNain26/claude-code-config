@@ -32,10 +32,12 @@
       "Edit(**/.git/config)",
       "Edit(~/.local/bin/**)",
       "Bash(ssh *victorserv*)",
-      "Bash(git push *--rece*)",
-      "Bash(git push *--exe*)",
+      "Bash(git push *--rec*)",
+      "Bash(git push *--ex*)",
       "Bash(git fetch *--upl*)",
-      "Bash(git pull *--upl*)"
+      "Bash(git fetch *--rec*)",
+      "Bash(git pull *--upl*)",
+      "Bash(git pull *--rec*)"
     ],
     "ask": [
       "Bash(victorserv admin *)",
