@@ -6,3 +6,7 @@
 !/CLAUDE.md
 !/settings.json
 !/rules/
+# Hand-written skills only; skills/synced is managed by Claude Code.
+!/skills/
+/skills/*
+!/skills/ship/

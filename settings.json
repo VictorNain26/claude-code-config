@@ -30,6 +30,9 @@
       "Read(~/.local/share/com.vercel.cli/auth.json)",
       "Edit(**/.git/hooks/**)",
       "Edit(**/.git/config)",
+      "Edit(**/*.tscn)",
+      "Edit(**/*.tres)",
+      "Edit(**/*.uid)",
       "Edit(~/.local/bin/**)",
       "Bash(ssh *victorserv*)",
       "Bash(git push *--rec*)",
@@ -106,8 +109,10 @@
     "ruby-lsp@claude-plugins-official": true,
     "cloudflare@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
     "rea@rea": true
   },
+  "outputStyle": "Concise",
   "extraKnownMarketplaces": {
     "rea": {
       "source": {
