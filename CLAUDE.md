@@ -5,7 +5,7 @@
   frontières (API, config, fichiers externes) ; mise et `rails new` pour Ruby/Rails.
 - Avant de dire qu'une tâche est finie, lance la vérification du projet indiquée dans son CLAUDE.md ou ses règles et montre la commande et sa sortie ; pour un changement visible dans l'app, lance aussi `/verify`.
 - Pour un changement qui ne tient pas en une phrase, passer par le mode plan. Le contenu d'un plan, la revue avant merge et la description de PR suivent le skill `ship`.
-- Un sous-agent pour une grosse PR ou un travail parallèle, une seule PR par agent ; une petite PR ou des correctifs se font dans la session. Ne paralléliser que des branches indépendantes, jamais les étages d'une pile. Toute commande de plus de 2 min tourne en arrière-plan ; une suite complète tourne en CI, pas en local.
+- Un sous-agent pour une grosse PR ou un travail parallèle, une seule PR par agent ; une petite PR ou des correctifs se font dans la session. Ne paralléliser que des branches indépendantes, jamais les étages d'une pile. Un worktree neuf a ses dépendances avant toute commande : installées depuis le lockfile, ou liées (`worktree.symlinkDirectories`) hors d'un monorepo. Sans elles, les hooks git (lefthook…) passent sans rien vérifier ; dans un monorepo, des `node_modules` liés font vérifier le code contre les paquets d'une autre branche. Toute commande de plus de 2 min tourne en arrière-plan ; une suite complète tourne en CI, pas en local.
 - Avant un run sans surveillance : un critère d'arrêt écrit (ex. CI verte et revue traitée), un plafond (`/goal`, `--max-turns` ou `--max-budget-usd`), et un essai d'abord sur quelques cas.
 - Lors d'une compaction, préserver : PR en cours, branche, plan en cours, dernière tâche terminée, décisions ouvertes.
 
