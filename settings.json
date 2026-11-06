@@ -81,7 +81,16 @@
   "skillOverrides": {
     "chrome-browser": "off",
     "built-in-browser": "off",
-    "computer-use": "off"
+    "computer-use": "off",
+    "google-workspace": "off",
+    "docx": "user-invocable-only",
+    "pdf": "user-invocable-only",
+    "pptx": "user-invocable-only",
+    "xlsx": "user-invocable-only",
+    "mcp-builder": "user-invocable-only",
+    "skill-creator": "user-invocable-only",
+    "web-artifacts-builder": "user-invocable-only",
+    "doc-coauthoring": "user-invocable-only"
   },
   "deniedMcpServers": [
     {
