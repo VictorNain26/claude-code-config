@@ -16,6 +16,7 @@ Un plan donne :
 
 - La duplication est tenue par un outil en CI (jscpd, flay…) ; sans cet outil, `/simplify` passe d'abord.
 - Une seule `/code-review` relit la branche dans un contexte neuf, contre le plan : correction et écarts au plan, sans le style. Une passe ; les correctifs ne sont pas relus à nouveau.
+- Un test commité avant le code n'est pas affaibli ensuite : `git diff <commit du test>..HEAD -- <fichiers de test>` est vide, ou la PR dit pourquoi.
 - Un constat retenu se corrige avant le merge, par la session courante quand il tient en quelques lignes.
 - Un diff qui touche l'authentification, les autorisations, les paiements, la cryptographie, les données personnelles ou des entrées externes est signalé dans la PR pour relecture humaine.
 
