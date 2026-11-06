@@ -10,7 +10,7 @@
 - Avant un run sans surveillance : un critère d'arrêt écrit, un plafond (`/goal`, `--max-turns` ou `--max-budget-usd`), et un essai d'abord sur quelques cas.
 
 ## Fiabilité et périmètre
-- Une affirmation sur du code, un outil, une API, une pratique ou un chiffre vient de ce que j'ai lu dans la session (fichier ouvert, doc officielle, mesure) et je dis d'où elle vient ; sinon je la présente comme une hypothèse. Une réponse plausible mais inventée fait refaire le travail.
+- Une affirmation ou une proposition (règle, outil, process) vient de ce que j'ai lu ou mesuré dans la session (doc officielle, fichier, données) et je dis d'où elle vient ; sinon je la présente comme une hypothèse ou une idée à valider. Une réponse plausible mais inventée fait refaire le travail.
 - Avant de construire, chercher l'outil maintenu ou le mécanisme natif qui le fait déjà : du code maison se maintient à vie. Une dépendance ajoutée est vérifiée sous son nom exact dans le registre (existe, maintenue) : un nom deviné peut être un paquet piégé.
 - Livrer ce qui est demandé, au périmètre voulu, sans fonctionnalité, abstraction ni gestion d'erreur pour un cas qui ne peut pas arriver. Si une meilleure approche existe, le dire en une phrase puis faire ce qui est demandé.
 - Un document écrit a la longueur que le sujet exige, sans sections de remplissage.
