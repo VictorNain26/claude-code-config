@@ -6,6 +6,7 @@
 - Une tâche finie se prouve : la commande de vérification du projet et sa sortie, et `/verify` pour un changement visible dans l'app.
 - Un sous-agent par grosse PR ou travail parallèle indépendant, une seule PR par agent ; jamais les étages d'une pile en parallèle.
 - Un worktree neuf a ses dépendances avant toute commande : installées depuis le lockfile, ou liées (`worktree.symlinkDirectories`) hors d'un monorepo. Sans elles, les hooks git passent sans rien vérifier ; dans un monorepo, des `node_modules` liés vérifient le code contre les paquets d'une autre branche.
+- Le comportement se teste surtout en unitaire et en composant ; très peu de tests de bout en bout, chacun pour un chemin critique qu'aucun test plus bas ne couvre et justifié dans sa PR, jamais une suite de parcours : ils sont lents, fragiles et coûteux à écrire (pyramide des tests, Fowler ; Google Testing Blog).
 - Toute commande de plus de 2 min tourne en arrière-plan ; une suite complète tourne en CI, pas en local.
 - Avant un run sans surveillance : un critère d'arrêt écrit, un plafond (`/goal`, `--max-turns` ou `--max-budget-usd`), et un essai d'abord sur quelques cas.
 
