@@ -12,8 +12,8 @@ Le fonctionnement de CLAUDE.md, des rules, skills, hooks et settings est dans la
 - Une erreur d'agent qui se répète devient un contrôle automatique (hook, permission, lint, CI) ;
   sinon une ligne de CLAUDE.md ou une règle ; sinon un skill, si c'est une procédure.
 - Un seul CLAUDE.md par dépôt, à la racine.
-- Chaque projet a dans `.claude/settings.json` un hook `Stop` qui lance sa vérification rapide
-  (typecheck, lint) quand elle tient en quelques secondes.
+- Chaque projet a dans `.claude/settings.json` un hook `Stop` qui lance son typecheck et son lint,
+  jamais ses tests ni son build.
 - Quand un agent ignore une règle écrite : `/doctor prompt-audit`, puis retirer ou automatiser.
 
 ## Interdits
