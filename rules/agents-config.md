@@ -22,4 +22,5 @@ Le fonctionnement de CLAUDE.md, des rules, skills, hooks et settings est dans la
   MCP fait déjà : deux sources pour un même comportement finissent par se contredire.
 - Jamais une consigne pour ce que Claude fait déjà par défaut (consignes des outils de Claude Code,
   guides de prompting du modèle) : elle coûte de l'attention à chaque session, et une consigne de
-  vérification fait sur-vérifier. Une ligne garde sa raison d'être : un défaut relevé ou une source.
+  revérification (« revérifie », « double-check ») fait sur-vérifier ; demander la preuve d'une
+  vérification n'en est pas une. Une ligne garde sa raison d'être : un défaut relevé ou une source.
