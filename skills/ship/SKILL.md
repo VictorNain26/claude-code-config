@@ -1,16 +1,14 @@
 ---
 name: ship
-description: Contenu attendu d'un plan, déroulé de la revue avant merge et contenu d'une description de PR. Utiliser en écrivant un plan, avant un merge ou en créant une PR.
+description: Ce qu'un plan ajoute à la trame du mode plan, la revue avant merge et la description de PR. Charger avant d'écrire un plan en mode plan, avant `gh pr create` et avant de merger une PR.
 ---
 
 # Plan
 
-Un plan donne :
+En plus de ce que demande le mode plan (contexte, approche, fichiers, réutilisation, vérification), un plan donne :
 - le comportement attendu par des exemples (entrée, sortie) ;
-- les fichiers et interfaces touchés ;
 - ce qui est hors périmètre et les exigences de sécurité ;
-- les cas de test (nominaux, limites, attaque), dont les valeurs attendues serviront aux tests ;
-- une vérification de bout en bout pour finir.
+- les cas de test (nominaux, limites, attaque) avec leurs valeurs attendues, qui serviront aux tests.
 
 # Avant le merge
 
